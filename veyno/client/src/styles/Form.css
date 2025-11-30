@@ -1,0 +1,61 @@
+/*client/src/styles/Form.css*/
+
+/* ===== VEYNO — FORM ELEMENTS ===== */
+
+/* Basic input styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  border-radius: var(--radius, 10px);
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  background: #fff;
+  color: inherit;
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Focus state */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brand-500, #0ea5e9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,.15);
+  outline: none;
+}
+
+/* Placeholder */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(0,0,0,.45);
+}
+
+/* Dark background variant */
+.dark-form input,
+.dark-form textarea,
+.dark-form select {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff;
+}
+.dark-form input::placeholder { color: rgba(255,255,255,.6); }
+
+/* Autofill fixes (Chrome/Edge/Brave) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: inherit;
+  -webkit-box-shadow: 0 0 0px 1000px inherit inset;
+  box-shadow: 0 0 0px 1000px inherit inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+/* Firefox focus ring off */
+input:-moz-focusring { outline: none; }
+input::-moz-focus-inner { border: 0; }

@@ -1,0 +1,878 @@
+/*client/src/styles/Home.css*/
+
+/* 1. WebKit-based browsers (Chrome, Safari, Edge) */
+html::-webkit-scrollbar {
+    display: none;
+}
+
+/* 2. Firefox (Mozilla) */
+html {
+    scrollbar-width: none;
+}
+
+/* ====== Page width unification for Tailwind grid ===== */
+:root{
+  --page-max: 1100px;
+  --cards-gap: 24px;
+}
+
+/* The product list remains centered */
+.container {
+  max-width: var(--page-max);
+  margin: 0 auto 24px;
+}
+
+/* HERO should be full-bleed (full screen width) */
+.hero-slider {
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0 calc(50% - 50vw) 24px; /* centered full-bleed */
+}
+
+/* Small vertical rhythm below the main content */
+.container { padding: 0 0; }
+
+/* ===== HERO ===== */
+.hero-row,
+.hero-slider,
+.hero-row { width: 100%; margin: 0 auto 24px}
+
+/* If old slick CSS remains, reset overflow conflicts */
+.slick-slider,
+.slick-list,
+.slick-track,
+.slick-slide {
+  position: relative;
+}
+.slick-list { overflow: hidden; }
+
+/* === DESKTOP / DEFAULT STYLES (above 1024px) === */
+
+/* We only want to see this div in mobile view, so we hide it by default in desktop view */
+.filter-mobile-controls { 
+    display: none;
+}
+
+/* Desktop search: visible (part of .filters grid) */
+.f-search-desktop { display: block; } 
+/* Mobile search: hidden (hidden input by default) */
+.f-search-mobile { display: none; }
+
+/* Default (large screen) grid layout added to filters */
+.filters {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) max-content 1fr;
+  column-gap: 12px;
+  align-items: center;
+  max-width: var(--page-max);
+  margin: 0 auto 18px;
+  padding: 0 var(--cards-gap);
+  max-height: none; 
+  overflow: visible;
+  transition: none;
+}
+
+.filters > :last-child{ 
+    justify-self:end; 
+    display:flex; 
+    gap:12px; 
+    align-items: center; 
+}
+
+/* Uniform style for inputs */
+.f-input,
+.f-select{
+  border: 1px solid #d9dee6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  height: 38px;
+}
+.f-input:focus,
+.f-select:focus {
+  border-color: hsl(198 88% 45%);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.20);
+}
+
+/* Min–Max block in compact grid */
+.f-range{
+  display: grid;
+  grid-template-columns: 84px 16px 84px;
+  align-items: center;
+  column-gap: 6px;
+}
+.f-range .f-input{ width: 100%; }
+.f-sep{ text-align:center; opacity:.6; }
+
+/* Filter/Delete buttons */
+.filters .btn{
+  background: #111 !important;
+  border: 1px solid #111 !important;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .2s ease, background .2s ease;
+  height: 38px;
+  white-space: nowrap;
+}
+
+/* Hide Number arrows (Chrome/Firefox) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number]{ -moz-appearance: textfield; }
+
+
+/* === RESPONSIVE LAYOUT (below 1024px) === */
+@media (max-width: 1024px) {
+    /* 1. MOBILE CONTROL BAR (Filter Button + Mobile Search) */
+    .filter-mobile-controls {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        max-width: var(--page-max);
+        margin: 0 auto 18px; 
+        padding: 0 var(--cards-gap);
+        gap: 12px;
+    }
+    .filter-mobile-controls > .f-search-mobile {
+        flex-grow: 1; 
+        display: block;
+    }
+    .f-search-desktop { 
+        display: none;
+    }
+    
+    .btn-filters {
+        display: flex !important;
+        align-items: center;
+    }
+
+    /* 2. MAIN FILTER WINDOW (.filters) */
+    .filters {
+        /* Default settings for mobile: each element on a separate line, hidden */
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+        
+        max-height: 0;
+        overflow: hidden;
+        margin-bottom: 0 !important;
+        padding: 0 var(--cards-gap); 
+        transition: max-height 0.3s ease; 
+    }
+  
+    /* DISPLAY: */
+    .filters.is-open {
+        max-height: 500px;
+        overflow: visible;
+        margin-bottom: 18px !important; 
+    }
+  
+    /* The sort/showing block should break the line (stacking) */
+    .filters > :last-child {
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 5px; 
+        justify-self: start; 
+    }
+
+    /* Adjust the Min-Max price fields */
+    .f-range {
+        grid-template-columns: 1fr 16px 1fr;
+    }
+}
+
+html, body { 
+    margin: 0; 
+    overflow-x: hidden; 
+}
+
+.hero-row,
+.hero-slider {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.hero-row > *:first-child {
+  margin-top: 0 !important;
+}
+.site-header {
+  border-bottom-color: rgba(255,255,255,.03) !important;
+}
+
+/* Select style */
+.f-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 34px;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); 
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+.f-check input[type="checkbox"] {
+  accent-color: #111;       
+  width: 18px; 
+  height: 18px; 
+  cursor: pointer;
+}
+
+.f-input {
+  border: 1px solid hsl(var(--input, 0 0% 85%));
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: hsl(var(--card, 0 0% 100%));
+  color: hsl(var(--foreground, 0 0% 10%));
+  outline: none;
+  box-shadow: none;
+}
+.f-input:focus {
+  border-color: hsl(var(--foreground, 0 0% 10%));
+  box-shadow: none;
+}
+
+.f-range .f-sep { font-weight: 500; }
+
+.filters > :last-child span{ font-size: 14px; opacity: .85; }
+
+.heart-icon {
+  color: #555; 
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.heart-icon.fav {
+  color: red; 
+}
+
+
+/* Top row: left is the search (flexible), right is the button */
+.filter-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.filter-top .f-input {
+  border: 1px solid #d9dee6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  height: 38px;
+  width: 100%;
+}
+.filter-top .f-input:focus {
+  border-color: hsl(198 88% 45%);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.20);
+}
+.btn-filters {
+  background: #111;
+  border: 1px solid #111;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .2s ease, background .2s ease;
+  height: 38px;
+  white-space: nowrap;
+}
+
+/* Drop-down panel: default – open on desktop, animated on mobile */
+.filters-panel {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-top: 10px;
+}
+
+/* 1st row in the panel: Min–Max in ONE row */
+.f-range {
+  display: grid;
+  grid-template-columns: 140px 16px 140px;
+  align-items: center;
+  column-gap: 8px;
+}
+.f-range .f-input {
+  border: 1px solid #d9dee6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  height: 38px;
+  width: 100%;
+}
+.f-range .f-input:focus {
+  border-color: hsl(198 88% 45%);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.20);
+}
+.f-sep { text-align: center; opacity: .6; }
+
+/* 2nd row in the panel: Showing + Sort by in ONE row */
+.f-sort {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.f-showing { font-size: 14px; color: var(--muted-foreground, #6b7280); }
+.f-showing-emph { font-weight: 600; color: var(--foreground, #111); }
+.f-sort-label { font-size: 14px; color: var(--muted-foreground, #6b7280); }
+.f-sort-control { display: flex; align-items: center; gap: 8px; }
+.f-sort-trigger { width: 180px; max-width: 220px; }
+
+/* ===== Responsive rules ===== */
+
+/* Mobile: the panel is closed by default, opens with a button */
+@media (max-width: 768px) {
+  .filters-panel {
+    max-height: 0;
+    margin-top: 0;
+  }
+  .filters-panel.is-open {
+    max-height: 700px;
+    margin-top: 10px;
+  }
+  /* Min–Max is still a row, but flexible */
+  .f-range {
+    grid-template-columns: 1fr 16px 1fr;
+  }
+}
+
+/* Desktop: should be conveniently open */
+@media (min-width: 769px) {
+  .filters-panel {
+    max-height: 999px;
+  }
+}
+
+/* Stretch all immediate children of the dropdown panel to full width */
+.filters-panel > * {
+  width: 100%;
+}
+
+/* The Showing + Sort by row should be full width and stretched */
+.f-sort {
+  width: 100%;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .f-sort {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+}
+
+/* ===== FilterBar – responsive (desktop: no button, search + min/max in one line) ===== */
+
+.filterbar {
+  max-width: var(--page-max);
+  margin: 0 auto 18px;
+  padding: 0 var(--cards-gap);
+}
+
+/* Top row */
+.filter-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Left side (search + desktop min/max) */
+.filter-top-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Search input – flexible width */
+.f-input {
+  border: 1px solid #d9dee6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  height: 38px;
+}
+.f-input:focus {
+  border-color: hsl(198 88% 45%);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.20);
+}
+.f-input-search {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* Min/Max row grid */
+.f-range {
+  display: grid;
+  grid-template-columns: 140px 16px 140px;
+  align-items: center;
+  column-gap: 8px;
+}
+.f-sep { text-align: center; opacity: .6; }
+
+/* Mobile drop-down panel */
+.filters-panel {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  margin-top: 10px;
+}
+.filters-panel > * { width: 100%; }
+.f-sort {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+}
+.f-showing { font-size: 14px; color: var(--muted-foreground, #6b7280); }
+.f-showing-emph { font-weight: 600; color: var(--foreground, #111); }
+.f-sort-label { font-size: 14px; color: var(--muted-foreground, #6b7280); white-space: nowrap; min-width: 55px; }
+.f-sort-control { display: flex; align-items: center; gap: 8px; }
+.f-sort-trigger { width: 180px; max-width: 220px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .btn-filters { display: inline-flex; }
+  .filters-panel { max-height: 0; margin-top: 0; }
+  .filters-panel.is-open { max-height: 700px; margin-top: 10px; }
+  .f-range--desktop { display: none; }
+  .f-range--mobile { display: grid; grid-template-columns: 1fr 16px 1fr; }
+  .f-sort { justify-content: flex-start; gap: 10px; }
+}
+
+@media (min-width: 769px) {
+  .btn-filters { display: none !important; }
+  .filters-panel { max-height: none; }
+  .f-range--mobile { display: none; }
+  .f-range--desktop { display: grid; }
+  .f-sort { justify-content: space-between; }
+}
+
+/* Fix alignment on mobile */
+@media (max-width: 768px) {
+  .f-sort {
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  /* Sort by block fix */
+  .f-sort-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  /* The "Sort by:" text and the drop-down should always be on the same line */
+  .f-sort-label {
+    white-space: nowrap;
+    min-width: 55px;
+  }
+
+  /* ===== Showing + Sort fix ===== */
+  .f-sort {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .f-showing {
+    font-size: 14px;
+    color: var(--muted-foreground, #6b7280);
+    flex-shrink: 0;
+  }
+
+  .f-showing-emph {
+    font-weight: 600;
+    color: var(--foreground, #111);
+  }
+
+  .f-sort-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .f-sort-label {
+    font-size: 14px;
+    color: var(--muted-foreground, #6b7280);
+    white-space: nowrap;
+  }
+
+  .f-sort-trigger {
+    height: 38px;
+    width: clamp(120px, 35vw, 180px);
+    max-width: 180px;
+  }
+
+}
+
+/* Mobile alignment: the Sort block should be exactly at the right edge */
+@media (max-width: 768px) {
+  .filters-panel > * { width: 100%; }
+  .f-sort {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .f-sort-control {
+    margin-left: auto;
+    padding-left: 0;
+  }
+  .f-sort-trigger {
+    height: 38px;
+    max-width: 220px;
+    width: clamp(140px, 40vw, 220px);
+  }
+  .f-sort-label {
+    white-space: nowrap;
+    min-width: 55px;
+  }
+}
+
+@media (max-width: 768px) {
+  .f-sort {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .f-sort-control {
+    margin-left: auto;
+  }
+  .f-sort-trigger {
+    width: clamp(120px, 50vw, 160px);
+  }
+}
+
+/* ===== Nice opening animation ===== */
+
+/* Default: hidden panel */
+.filters-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    max-height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+/* Open state: visible, slight slide-down + fade */
+.filters-panel.is-open {
+  max-height: 700px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The inner elements of the panel also gently "float" */
+.filters-panel.is-open > * {
+  animation: fadeSlideIn 0.45s ease forwards;
+}
+
+/* Keyframe for each inner row */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === FIX 1: On desktop the filters panel should actually be visible === */
+@media (min-width: 769px) {
+  .filters-panel {
+    max-height: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* === FIX 2: “Showing …” + “Sort by” in one line on mobile === */
+.f-sort {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+/* The “Showing …” on the left can be shortened flexibly */
+.f-showing {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Compact the right-hand line block */
+.f-sort-control {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  .f-sort-label { display: none; }
+}
+
+.f-sort-trigger {
+  height: 38px;
+  width: clamp(110px, 38vw, 160px);
+  max-width: 160px;
+}
+
+@media (max-width: 480px) {
+  .f-sort { flex-wrap: nowrap; }
+}
+
+/* Hero full-bleed */
+.hero-row > .hero-slider {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 calc(50% - 50vw) 24px !important;
+}
+
+.hero-slider { position: relative; }
+.hero-slide  { position: absolute; inset: 0; }
+
+/* Visibility: the active and the previous (while fading) should be visible */
+.hero-slide { opacity: 0; visibility: hidden; transition: opacity 480ms ease; background:#0b0b0b; }
+.hero-slide.is-prev,
+.hero-slide.is-active { opacity: 1; visibility: visible; }
+
+/* Layers: active on top */
+.hero-slide.is-prev   { z-index: 10; }
+.hero-slide.is-active { z-index: 20; }
+
+/* Background overlay should NEVER absorb clicks */
+.hero-slide > .pointer-events-none { pointer-events: none; }
+
+/* Low render quality – smoother transition */
+.hero-img { backface-visibility: hidden; will-change: opacity; }
+
+/* Full-bleed hero */
+.hero-row > .hero-slider {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin: 0 calc(50% - 50vw) 24px !important;
+}
+
+/* Perspective on the container for 3D paging */
+.hero-slider-3d {
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  background: #0b0b0b;
+}
+
+/* Default: everything hidden until a class tells you which one is visible */
+.hero-slide.hidden-slide {
+  opacity: 0;
+  visibility: hidden;
+  z-index: 0;
+}
+
+/* Entry from the right */
+.hero-slide.enter-from-right {
+  z-index: 20;
+  visibility: visible;
+  animation: heroFlipInRight 1600ms cubic-bezier(.22,.61,.36,1) forwards;
+  transform-origin: 0% 50%;
+}
+
+/* Exit left (previous page “back”) */
+.hero-slide.exit-to-left {
+  z-index: 10;
+  visibility: visible;
+  animation: heroFlipOutLeft 1600ms cubic-bezier(.22,.61,.36,1) forwards;
+  transform-origin: 100% 50%;
+}
+
+/* Enter from the left (page back) */
+.hero-slide.enter-from-left {
+  z-index: 20;
+  visibility: visible;
+  animation: heroFlipInLeft 1600ms cubic-bezier(.22,.61,.36,1) forwards;
+  transform-origin: 100% 50%;
+}
+
+/* Exit right (page forward backward) */
+.hero-slide.exit-to-right {
+  z-index: 10;
+  visibility: visible;
+  animation: heroFlipOutRight 1600ms cubic-bezier(.22,.61,.36,1) forwards;
+  transform-origin: 0% 50%;
+}
+
+@keyframes heroFlipInRight {
+  0%   { transform: rotateY(90deg) translateZ(0); opacity: 0; }
+  60%  { transform: rotateY(-6deg); opacity: 1; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+
+@keyframes heroFlipOutLeft {
+  0%   { transform: rotateY(0deg); opacity: 1; }
+  100% { transform: rotateY(-90deg) translateZ(0); opacity: 0; }
+}
+
+@keyframes heroFlipInLeft {
+  0%   { transform: rotateY(-90deg) translateZ(0); opacity: 0; }
+  60%  { transform: rotateY(6deg); opacity: 1; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+
+@keyframes heroFlipOutRight {
+  0%   { transform: rotateY(0deg); opacity: 1; }
+  100% { transform: rotateY(90deg) translateZ(0); opacity: 0; }
+}
+
+/* Slower stepping to product cards */
+:root {
+  --footer-anim-duration: 1200ms;
+  --footer-anim-stagger: 200ms;
+  --footer-anim-ease: cubic-bezier(.20,.65,.20,1);
+}
+
+.product-grid:not(.animate-in-view) .footer-anim-item {
+  opacity: 0;
+  transform: translateY(48px);
+}
+
+.product-grid.animate-in-view .footer-anim-item {
+  animation: footer-fade-up var(--footer-anim-duration) var(--footer-anim-ease) both;
+  animation-delay: calc(var(--i, 0) * var(--footer-anim-stagger));
+}
+
+@keyframes footer-fade-up {
+  0%   { opacity: 0; transform: translateY(48px); }
+  60%  { opacity: 1; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* === HeroSlider navigation arrows – consistent style like on the Product page === */
+.hero-slider .hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  cursor: pointer;
+  transition: background 0.2s ease, filter 0.2s ease;
+}
+
+.hero-slider .hero-nav svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.hero-slider .hero-nav:hover {
+  background: rgba(0, 0, 0, 0.7);
+  filter: none;
+}
+
+.hero-slider .hero-nav:active {
+  transform: translateY(-50%) scale(1);
+  filter: none;
+}
+
+.hero-slider .hero-nav.prev { left: 24px; }
+.hero-slider .hero-nav.next { right: 24px; }
+
+/* === Hide HeroSlider arrows on mobile === */
+@media (max-width: 768px) {
+  .hero-slider .hero-nav {
+    display: none !important;
+  }
+}
+
+/* Disable only on the filterbar */
+.filterbar *:focus,
+.filterbar *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Knock out Tailwind ring */
+.filterbar * {
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-color: transparent !important;
+}
+
+/* Mobile blue flash (Safari/Chrome) */
+.filterbar {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filterbar select,
+.filterbar input[type="number"],
+.filterbar button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* FilterBar: completely neutralize focus */
+.filterbar .f-input:focus,
+.filterbar .f-select:focus,
+.filterbar .f-sort-trigger:focus {
+  border-color: #000000 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* If there is anything left of the ring/shadow */
+.filterbar *:focus,
+.filterbar *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.filterbar.filterbar--no-pad {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}

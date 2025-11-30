@@ -1,0 +1,65 @@
+/* client/src/styles/Card.css */
+
+/* ===== VEYNO — CARDS (product, generic) ===== */
+
+/* Generic card */
+.card {
+  background: #fff;
+  border: 1px solid rgba(16,24,40,.08);
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--shadow, 0 6px 18px rgba(16,24,40,.06));
+  overflow: hidden;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg, 0 14px 30px rgba(16,24,40,.12));
+  border-color: rgba(16,24,40,.12);
+}
+
+/* Product card */
+.product-card { display: flex; flex-direction: column; }
+
+/* Image holder – fixed ratio */
+.product-card .pc-media {
+  position: relative; width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #f6f7f9;
+  overflow: hidden;
+}
+.product-card .pc-media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .3s ease;
+}
+.product-card:hover .pc-media img { transform: scale(1.03); }
+
+/* Trunk */
+.product-card .pc-body { padding: 12px; display: grid; gap: 6px; }
+.product-card .pc-title {
+  font-weight: 600; line-height: 1.3; color: #0f172a;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.product-card .pc-meta { font-size: .9rem; color: #475569; }
+
+/* Price */
+.product-card .pc-price-row { display: flex; align-items: center; gap: 8px; }
+.product-card .pc-price { font-weight: 700; color: #111827; }
+.product-card .pc-price-old {
+  color: #9ca3af; text-decoration: line-through; font-weight: 500;
+}
+
+/* Label/badge on image */
+.product-card .pc-badges {
+  position: absolute; left: 8px; top: 8px; display: flex; gap: 6px; z-index: 2;
+}
+.product-card .pc-badge {
+  background: #111827; color: #fff; font-size: 12px; line-height: 1;
+  padding: 4px 8px; border-radius: 999px;
+}
+
+/* CTA line */
+.product-card .pc-actions {
+  display: flex; align-items: center; gap: 8px; padding: 12px;
+  border-top: 1px solid rgba(16,24,40,.08);
+}
+.product-card .pc-actions .btn { flex: 1 1 auto; }

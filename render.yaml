@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: veyno-webshop
+    env: node
+    plan: free
+    region: frankfurt
+    buildCommand: |
+      npm install
+      npm run build
+    startCommand: npm start
+    runtime: node
+    nodeVersion: 20
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Put the rest in the Render dashboard or convert these to "fromSecret"

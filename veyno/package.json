@@ -1,0 +1,31 @@
+{
+  "name": "webshop",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace client\" \"npm run dev --workspace server\"",
+    "build": "npm run build --workspace client && npm run build --workspace server",
+    "start": "node -r dotenv/config server/index.js dotenv_config_path=server/.env",
+    "lint": "npm run lint --workspace client"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.913.0",
+    "@google/genai": "^1.25.0",
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "dompurify": "^3.3.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "mime": "^4.1.0",
+    "sharp": "^0.34.4"
+  }
+}

@@ -1,0 +1,39 @@
+/*client/src/styles/Cart.css*/
+
+/* CART PAGE ONLY */
+.cart-page {
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.cart-page::before,
+.cart-page::after {
+  content: "";
+  position: fixed;
+  border-radius: 9999px;
+  filter: blur(48px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.cart-page::before {
+  top: 80px;
+  left: 25%;
+  width: 24rem;
+  height: 24rem;
+  background: hsl(var(--primary) / 0.05);
+}
+
+.cart-page::after {
+  bottom: 80px;
+  right: 25%;
+  width: 24rem;
+  height: 24rem;
+  background: hsl(var(--secondary) / 0.05);
+}
+
+@media (max-width: 640px) {
+  .card, .card * { max-width: 100%; }
+}
+

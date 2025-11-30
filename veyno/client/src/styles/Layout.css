@@ -1,0 +1,29 @@
+/*client/src/styles/Layout.css*/
+
+/* ===== LAYOUT (page level) ===== */
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+
+.layout { display: flex; flex-direction: column; min-height: 100vh; }
+.layout-main { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; }
+.layout-content { padding: 0 20px 20px; }
+
+
+.site-footer { margin-top: auto; flex-shrink: 0; }
+
+/* ===== HEADER OFFSET handling ===== */
+
+/* Default value (fallback) */
+:root {
+  --hdr-h: 56px;
+}
+
+/* EVERY page: get offset... */
+.layout-main:not(.no-header-offset) {
+  padding-top: var(--hdr-h);
+  transition: padding-top 0.25s ease;
+}
+
+/* ...except where we specifically ask NOT to */
+.layout-main.no-header-offset {
+  padding-top: 0 !important;
+}
