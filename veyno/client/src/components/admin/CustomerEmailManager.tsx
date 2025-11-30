@@ -59,11 +59,6 @@ function buildVeynoPreviewHtml(rawHtml: string, to = "preview@example.com", subj
           <p style="font-size:12px;color:#6b7280;line-height:1.5;margin:0 0 12px;">
             You are receiving this email because you subscribed to the VEYNO newsletter.
           </p>
-          <a href="${FRONT}/unsubscribe?email=${encodeURIComponent(to)}"
-             style="display:inline-block;padding:10px 20px;border:1px solid #000;color:#000;text-decoration:none;
-                    font-size:12px;letter-spacing:1px;text-transform:uppercase;border-radius:4px;">
-            Unsubscribe
-          </a>
         </div>
       </div>
 

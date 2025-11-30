@@ -55,6 +55,8 @@ dotenv.config();
 const app = express();
 app.set("trust proxy", 1);
 
+app.disable("x-powered-by");
+
 app.use(cookieParser());
 app.use(
     helmet({
@@ -150,10 +152,23 @@ function getClientIp(req) {
     return raw.split(",")[0].trim();
 }
 
+//--------limiters--------
 const publicLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
     message: "Too many requests from this IP, please try again later.",
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many failed logins. Please try again later."
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: "Too many registrations from this IP address. Please try again later."
 });
 
 // /healthz – simple health endpoint
@@ -497,7 +512,7 @@ app.post('/api/webhook', bodyParser.raw({ type: 'application/json' }), async (re
                     await sendAdminOrderEmail(order);
                     console.log('Payment confirmed email(s) sent (webhook).');
                 } catch (e) {
-                    console.error('❌ Email sending error (webhook):', e);
+                    console.error('Email sending error (webhook):', e);
                 }
 
                 await order.save();
@@ -507,14 +522,14 @@ app.post('/api/webhook', bodyParser.raw({ type: 'application/json' }), async (re
         }
         res.json({ received: true });
     } catch (e) {
-        console.error('❌ Webhook processing error:', e);
+        console.error('Webhook processing error:', e);
         res.status(500).json({ error: 'Webhook processing error' });
     }
 });
 
 /* ---- normal JSON parser ---- */
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 //UTF-8 headers for all JSON responses
 app.use("/api", (req, res, next) => {
@@ -595,7 +610,7 @@ function setAuthCookie(res, token) {
 }
 
 //Registration
-app.post("/api/auth/register", async (req, res) => {
+app.post("/api/auth/register", registerLimiter, async (req, res) => {
     try {
         let { name, email, password } = req.body || {};
         if (!name || !email || !password)
@@ -678,7 +693,7 @@ app.post("/api/auth/verify", async (req, res) => {
 });
 
 // --- LOGIN ---
-app.post("/api/auth/login", async (req, res) => {
+app.post("/api/auth/login", loginLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password)
