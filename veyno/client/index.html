@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+ 
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' blob: https://js.stripe.com https://accounts.google.com https://pay.google.com;
+    script-src-elem 'self' 'unsafe-eval' blob: https://js.stripe.com https://accounts.google.com https://pay.google.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https:;
+    font-src 'self' data:;
+    connect-src 'self' http://localhost:5555 https://api.stripe.com https://r.stripe.com https://m.stripe.network https://accounts.google.com https://pay.google.com;
+    frame-src https://js.stripe.com https://hooks.stripe.com https://pay.google.com https://accounts.google.com;
+    worker-src 'self' blob:;
+    child-src blob:;
+  ">
+  
+  <link rel="icon" type="image/svg+xml" href="/logo/logo_veyno.svg" />
+  <title>VEYNO Hungary</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+/* client/src/styles/Product.css */
+
+/* ==== Page shell ======================================================= */
+.pdp-wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.pdp-wrap.luxe { background: hsl(var(--background)); color: hsl(var(--foreground)); }
+
+/* ==== Breadcrumb – uppercase + tracking from TSX ================ */
+.breadcrumb {
+  display: flex; gap: 8px; align-items: baseline;
+  font-size: 11px; line-height: 1.2; margin-bottom: 22px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+.breadcrumb a { color: hsl(var(--foreground)); opacity: .9; text-decoration: none; }
+.breadcrumb a:hover { color: hsl(var(--foreground)); opacity: 1; }
+.breadcrumb .muted { color: hsl(var(--foreground)); opacity: .7; }
+
+/* ==== Grid – TSX ratio: 1.2fr / 1fr ==== */
+.pdp-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; }
+@media (max-width: 1024px){ .pdp-grid { grid-template-columns: 1fr; gap: 22px; }}
+
+/* ==== Gallery ==== */
+.gallery .main-img {
+  position: relative;
+  border: 1px solid hsl(var(--border)); border-radius: 12px; overflow: hidden;
+  background: hsl(var(--card)); cursor: default;
+  box-shadow: var(--shadow-luxury);
+}
+.gallery .main-img img { width: 100%; height: 560px; object-fit: cover; display: block; transition: transform .7s ease; }
+.gallery .main-img:hover img { transform: scale(1.03); }
+@media (max-width: 900px){ .gallery .main-img img { height: 420px; } }
+
+/* Arrows – TSX sentiment */
+.nav-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 999px;
+  background: rgba(255,255,255,.95); backdrop-filter: blur(6px);
+  border: 0; display: grid; place-items: center; font-size: 22px; line-height: 1;
+  box-shadow: var(--shadow-luxury); cursor: pointer; opacity: 0; transition: opacity .2s ease, filter .2s;
+}
+.gallery .main-img:hover .nav-arrow { opacity: 1; }
+.nav-arrow.left { left: 18px; } .nav-arrow.right { right: 18px; }
+.nav-arrow:hover { filter: brightness(.97); }
+
+/* Indicator strips – from TSX */
+.indicators {
+  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+  display: flex; gap: 8px;
+}
+.indicators .bar {
+  width: 32px; height: 2px; background: rgba(0,0,0,.15);
+  border: 0; padding: 0; cursor: pointer; transition: background .2s ease, width .2s ease;
+}
+.indicators .bar.active { background: hsl(var(--foreground)); }
+
+/* Thumbs */
+.gallery .thumbs { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.gallery .thumb {
+  width: 80px; height: 100px; border-radius: 10px; border: 1px solid hsl(var(--border));
+  padding: 0; background: hsl(var(--card)); cursor: pointer; overflow: hidden;
+  transition: filter .15s ease, opacity .15s ease;
+}
+.gallery .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery .thumb.active { outline: 2px solid hsl(var(--foreground)); }
+.gallery .thumb:not(.active):hover { filter: brightness(.98); opacity: .9; }
+
+/* No image fallback */
+.noimg {
+  height: 240px; display: grid; place-items: center;
+  border: 1px dashed hsl(var(--border)); border-radius: 12px; color: hsl(var(--muted-foreground));
+}
+
+/* ==== Details (right column) ==== */
+.details.sticky { position: sticky; top: 120px; height: fit-content; }
+.title { margin: 4px 0 8px; font-size: clamp(28px, 4vw, 40px); line-height: 1.12; letter-spacing: .01em; }
+.title.serif { font-family: 'Cormorant Garamond', 'Georgia', serif; font-weight: 400; }
+
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; position: relative; z-index: 4; }
+.chip {
+  font-size: 12px; padding: 4px 8px; background: hsl(var(--secondary));
+  border: 1px solid hsl(var(--border)); color: hsl(var(--foreground)); border-radius: 999px;
+}
+.chip.link { color: hsl(var(--foreground)); text-decoration: none; }
+.chip.link:hover { text-decoration: underline; }
+
+.price-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 6px; }
+.price { font-size: 26px; font-weight: 800; letter-spacing: .02em; }
+.price .old { text-decoration: line-through; opacity: .6; margin-right: 8px; }
+.stock { font-weight: 700; }
+.stock.in { color: #16a34a; }
+.stock.out { color: #dc2626; }
+
+.shortdesc { margin: 10px 0 14px; color: hsl(var(--foreground)); opacity: .9; line-height: 1.6; }
+
+/* ==== Size selector (TSX feel, rendered in CSS) ==== */
+.size-block { margin: 8px 0 12px; }
+.size-head { display: flex; align-items: center; justify-content: space-between; }
+.size-head p { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
+.size-guide {
+  all: unset; cursor: pointer; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  text-decoration: underline; opacity: .9;
+}
+.sizes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+@media (max-width: 560px){ .sizes { grid-template-columns: repeat(4, 1fr); } }
+
+.size-btn {
+  padding: 14px 0; text-align: center; font-size: 13px; letter-spacing: .15em; text-transform: uppercase;
+  border: 1px solid hsl(var(--border)); border-radius: 6px; background: hsl(var(--card));
+  cursor: pointer; transition: filter .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+.size-btn:hover { border-color: hsl(var(--foreground)); }
+.size-btn.is-active { background: hsl(var(--foreground)); color: hsl(var(--background)); border-color: hsl(var(--foreground)); }
+.size-btn.is-suggested { border-style: dashed; border-width: 2px; }
+.size-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ==== Size recommendation panel ==== */
+.size-reco {
+  margin: 8px 0 12px; padding: 10px; border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--card));
+}
+.size-reco-head { font-size: 13px; opacity: .85; margin-bottom: 6px; }
+.size-reco-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.f-input {
+  padding: 8px 10px; border: 1px solid hsl(var(--input)); border-radius: 10px; background: hsl(var(--card));
+}
+
+/* ==== Quantity + ATC ==== */
+.buy-row { display: flex; gap: 12px; align-items: center; margin: 8px 0 14px; flex-wrap: wrap; }
+.qty { display: inline-flex; align-items: center; gap: 6px; }
+.qty-btn {
+  width: 34px; height: 34px; border: 1px solid hsl(var(--border)); border-radius: 8px;
+  background: hsl(var(--card)); font-size: 18px; font-weight: 700; cursor: pointer; color: hsl(var(--foreground));
+}
+.qty-input {
+  width: 60px; text-align: center; padding: 8px 6px; border: 1px solid hsl(var(--border)); border-radius: 8px;
+}
+.btn {
+  padding: 10px 14px; border-radius: 10px; border: 1px solid hsl(var(--border));
+  background: hsl(var(--secondary)); cursor: pointer; transition: filter .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.btn:hover { filter: brightness(.98); }
+.btn.primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); box-shadow: var(--shadow-luxury); }
+.btn.primary.atc { letter-spacing: .2em; text-transform: uppercase; height: 56px; padding: 0 18px; }
+.btn.primary:disabled { opacity: .5; cursor: default; }
+.btn.primary:disabled:hover,
+.btn:disabled:hover,
+button:disabled:hover {
+  filter: none !important; box-shadow: none !important; background: #ddd !important; color: #666 !important; cursor: not-allowed;
+}
+
+/* ==== USP list ==== */
+.usp { margin: 12px 0; padding-left: 18px; color: hsl(var(--foreground)); }
+.usp li { margin: 4px 0; }
+
+/* ==== Description / specification ==== */
+.block { margin-top: 18px; }
+.block-title { font-weight: 800; margin-bottom: 10px; }
+.desc { line-height: 1.6; color: hsl(var(--foreground)); opacity: .92; }
+.specs { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.specs th, .specs td { padding: 8px 10px; border-bottom: 1px solid hsl(var(--border)); text-align: left; }
+.specs th { width: 36%; color: hsl(var(--muted-foreground)); }
+
+/* ==== Related products ==== */
+.related { margin-top: 32px; }
+.rel-head { font-weight: 400; font-size: 28px; margin-bottom: 10px; letter-spacing: .01em; }
+.rel-head.serif { font-family: 'Cormorant Garamond', 'Georgia', serif; }
+
+.rel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.rel-card {
+  display: block; text-decoration: none; color: inherit;
+  border: 1px solid hsl(var(--border)); border-radius: 12px; overflow: hidden; background: #fff;
+  padding: 12px; box-shadow: 0 6px 18px rgba(16,24,40,.06);
+  transition: filter .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.rel-card:hover { filter: brightness(0.97); box-shadow: 0 14px 30px rgba(16,24,40,.12); transform: translateY(-2px); }
+.rel-card img { display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit: contain; background:#fff; transition: transform .2s ease; }
+.rel-card:hover img { transform: scale(1.01); }
+.rel-name { padding: 8px 10px 0; font-weight: 600; }
+.rel-price { padding: 0 10px 10px; color: hsl(var(--foreground)); }
+.rel-price .old { text-decoration: line-through; opacity: .6; margin-right: 6px; }
+.rel-price .now { font-weight: 700; }
+
+/* ==== Zoom overlay (existing expanded) ==== */
+.zoom-overlay { position: fixed; inset: 0; z-index: 9999; overscroll-behavior: contain; }
+.zoom-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.75); display: grid; place-items: center; }
+.zoom-stage {
+  position: relative; width: min(90vw, 1200px); height: min(90vh, 90vw); overflow: hidden;
+  background: #111; border-radius: 12px;
+}
+.zoom-stage img {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1); transform-origin: center center;
+  user-select: none; pointer-events: none; max-width: none;
+}
+.zoom-stage.grab { cursor: grab; } .zoom-stage.grabbing { cursor: grabbing; }
+.zoom-toolbar {
+  position: absolute; left: 50%; bottom: clamp(10px, 3vh, 24px); transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(30,30,30,0.9); padding: 8px 12px; border-radius: 999px; color: #fff; font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+.zoom-toolbar button {
+  all: unset; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%;
+  background: #222; border: 1px solid #333; cursor: pointer; font-size: 20px; line-height: 1;
+}
+.zoom-toolbar button:hover { background: #2c2c2c; }
+.zoom-toolbar .zoom-level { min-width: 54px; text-align: center; opacity: .9; }
+.zoom-toolbar .zoom-close { font-size: 22px; padding-bottom: 2px; }
+
+/* ==== My magnifying glass icon overlay on the main image ==== */
+.gallery .main-img .zoom-icon{
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96);
+  width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
+  border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; opacity: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 3;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.gallery .main-img:hover .zoom-icon{ opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* ==== Skeleton ==== */
+.skeleton .skeleton-img {
+  height: 560px; border-radius: 12px; background: linear-gradient(90deg,#f3f3f3,#ececec,#f3f3f3);
+  animation: sk 1.1s infinite;
+}
+.skeleton .skeleton-info { display: grid; gap: 10px; }
+.sk-line { height: 16px; border-radius: 8px; background: linear-gradient(90deg,#f3f3f3,#ececec,#f3f3f3); animation: sk 1.1s infinite; }
+.w60 { width: 60%; } .w40 { width: 40%; } .w80 { width: 80%; } .w50 { width: 50%; }
+@keyframes sk { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
+
+/* ===== ADD TO CART ===== */
+.btn.primary.atc {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  height: 56px;
+  width: 100%;
+  box-shadow: 0 12px 30px rgba(0,0,0,.12);
+}
+.btn.primary.atc:hover { filter: brightness(0.95); }
+
+/* ==== Thumbs: the currently inactive image is dimmed ==== */
+.gallery .thumb.inactive { opacity: .55; filter: grayscale(8%); }
+.gallery .thumb.active { opacity: 1; filter: none; outline: 2px solid hsl(var(--foreground)); }
+
+/* ==== Related section – header bar + image ratio ==== */
+.rel-bar {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 34px 0 14px;
+}
+
+.rel-viewall{
+  text-decoration: underline;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: hsl(var(--foreground));
+  opacity: .85;
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+}
+
+.rel-viewall:hover { opacity: 1; text-decoration: underline; }
+
+.rel-card { background: #fff; }
+.rel-card .rel-imgwrap { aspect-ratio: 3/4; background: #eee; overflow: hidden; margin-bottom: 10px; }
+.rel-card .rel-imgwrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+.rel-card:hover .rel-imgwrap img { transform: scale(1.05); }
+.upper { text-transform: uppercase; letter-spacing: .2em; font-size: 13px; }
+
+/* ===== Thumbs dimming ===== */
+.gallery .thumb.inactive { opacity: .55; filter: grayscale(8%); }
+.gallery .thumb.active { opacity: 1; filter: none; outline: 2px solid hsl(var(--foreground)); }
+
+/* ===== ADD TO CART button (black, full width) ===== */
+.btn.primary.atc {
+  background: #111; color: #fff; border-color: #111;
+  text-transform: uppercase; letter-spacing: .2em;
+  height: 56px; width: 100%;
+  box-shadow: 0 14px 40px rgba(0,0,0,.12);
+}
+.btn.primary.atc:hover { filter: brightness(0.95); }
+
+/* ===== Accordion (drop-down sections) ===== */
+.acc-wrap { margin-top: 16px; }
+.acc-item { border-top: 1px solid hsl(var(--border)); }
+.acc-item:last-child { border-bottom: 1px solid hsl(var(--border)); }
+.acc-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: transparent; border: 0; padding: 18px 0; cursor: pointer;
+}
+.acc-title {
+  font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
+}
+.acc-icon {
+  font-size: 18px; width: 22px; text-align: center; line-height: 1;
+}
+.acc-panel { overflow: visible; position: relative; z-index: 1; transition: height .25s ease; }
+.acc-inner { padding: 4px 0 18px; color: hsl(var(--muted-foreground)); }
+.acc-list { margin: 0; padding-left: 18px; }
+.acc-list li { margin: 6px 0; }
+
+/* ---- Size guide in accordion, compact ---- */
+.size-reco.compact { padding: 0; }
+.size-reco .size-reco-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.size-reco .hint { margin-top: 6px; opacity: .85; }
+
+/* ---- NiceSelect (custom select) ---- */
+.nselect { position: relative; outline: none; }
+.nselect .nselect-btn {
+  width: 100%;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:8px 10px; border:1px solid hsl(var(--input)); border-radius:10px;
+  background:hsl(var(--card)); color:hsl(var(--foreground));
+  cursor:pointer; outline:none; box-shadow:none;
+}
+.nselect[aria-expanded="true"] .nselect-btn { border-color:hsl(var(--foreground)); }
+.nselect-menu{
+  position:absolute; z-index:1000; top:calc(100% + 6px); left:0; right:0;
+  background:hsl(var(--card)); border:1px solid hsl(var(--border)); border-radius:10px;
+  box-shadow:0 12px 30px rgba(16,24,40,.12); padding:6px; max-height:260px; overflow:auto;
+}
+
+.nselect-opt { padding:10px 12px; border-radius:8px; cursor:pointer; user-select:none; }
+.nselect-opt:hover, .nselect-opt.active { background:hsl(var(--secondary)); }
+.nselect-opt.selected { font-weight:600; }
+
+/* ---- Global: blue focus/outline OFF on recommender inputs ---- */
+.nselect *, .f-input, .f-input:focus, .f-input:focus-visible, .nselect .nselect-btn:focus {
+  outline:none !important; box-shadow:none !important;
+}
+
+.f-input[type="number"]{ text-align:center; }
+
+.btn.dark{ background:#111; color:#fff; border:1px solid #111; border-radius:10px; padding:8px 12px; }
+.btn.dark:hover{ filter:brightness(.95); }
+.btn.dark:disabled{ opacity:.5; cursor:not-allowed; }
+
+/* Accordion panel: natural layout, don't cut the child off */
+.acc-panel { 
+  overflow: visible; 
+  position: relative; 
+  z-index: 0;
+}
+
+/* The custom dropdown menu should always be on top of everything */
+.nselect-menu{
+  position: absolute;
+  z-index: 1000;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(16,24,40,.12);
+  padding: 6px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+/* Number inputs centered */
+.f-input[type="number"] { text-align: center; }
+
+/* Black “Apply Recommendation” button */
+.btn.dark { 
+  background:#111; 
+  color:#fff; 
+  border:1px solid #111; 
+  border-radius:10px; 
+  padding:8px 12px; 
+}
+.btn.dark:hover { filter: brightness(.95); }
+.btn.dark:disabled { opacity:.5; cursor:not-allowed; }
+
+/* Remove the entire NiceSelect frame at the wrapper level */
+.nselect {
+  border: none !important;
+  background: transparent;
+}
+
+/* The button itself should remain consistent with the smaller inputs */
+.nselect .nselect-btn {
+  border: 1px solid hsl(var(--input));
+  border-radius: 10px;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+}
+
+/* Don't draw extra frame when in focus */
+.nselect .nselect-btn:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: hsl(var(--foreground));
+}
+
+/* --- Size recommendation: remove the large outer frame --- */
+.acc-item .size-reco,
+.size-reco.compact {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* --- Input focus: no blue frame/glow --- */
+.f-input {
+  border: 1px solid hsl(var(--input));
+  border-radius: 10px;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  outline: none;
+  box-shadow: none;
+}
+
+.f-input:focus,
+.f-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: hsl(var(--foreground)) !important;
+}
+
+/* ===== Accordion – extra smooth open & close ===== */
+.acc-wrap { margin-top: 16px; }
+.acc-item { border-top: 1px solid hsl(var(--border)); }
+.acc-item:last-child { border-bottom: 1px solid hsl(var(--border)); }
+
+.acc-toggle {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  background: transparent; border: 0; padding: 18px 0; cursor: pointer;
+}
+
+.acc-title {
+  font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
+}
+
+.acc-icon {
+  font-size: 18px; width: 22px; text-align: center; line-height: 1;
+  transition: transform 380ms cubic-bezier(.2,.7,.3,1);
+}
+.acc-item.open .acc-icon { transform: rotate(45deg); }
+
+.acc-item .acc-panel {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  will-change: max-height, opacity, transform;
+  transition:
+    max-height var(--acc-dur, 520ms) var(--acc-ease, cubic-bezier(.22,.61,.36,1)),
+    opacity   var(--acc-dur-fade, 420ms) ease,
+    transform var(--acc-dur-move, 420ms) var(--acc-ease, cubic-bezier(.22,.61,.36,1));
+}
+
+/* open state – slower, “soft” ease */
+.acc-item.open .acc-panel {
+  max-height: 1200px;
+  opacity: 1;
+  transform: translateY(0);
+  --acc-dur: 560ms;
+  --acc-dur-fade: 520ms;
+  --acc-dur-move: 520ms;
+  --acc-ease: cubic-bezier(.22,.61,.36,1);
+}
+
+/* separate inner padding to prevent jumping */
+.acc-panel > .acc-inner { padding: 12px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .acc-item .acc-panel,
+  .acc-icon { transition: none; }
+}
+
+/* === PDP gallery nav arrows – match the magnifying glass and DO NOT “jump off” === */
+
+/* 1) Match size and background to the magnifier */
+.nav-arrow {
+  width: 42px !important;
+  height: 42px !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: none;
+  transition: opacity .2s ease;
+}
+
+/* 2) Don't darken or change size/position on hover */
+.nav-arrow:hover {
+  filter: none !important;
+  transform: translateY(-50%) !important;
+}
+
+/* 3) Active (press) – disable “pressing” */
+.nav-arrow:active,
+button.nav-arrow:active {
+  filter: none !important;
+  transform: translateY(-50%) !important;
+  box-shadow: none !important;
+}
+
+/* 4) Arrows */
+.gallery .main-img .nav-arrow:active {
+  transform: translateY(-50%) !important;
+}
+
+/* === PDP gallery nav arrows – match the magnifying glass and be centered === */
+.nav-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px !important;
+  height: 42px !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: #fff !important;
+  border: 0px;
+  border-radius: 50%;
+  box-shadow: none;
+  transition: opacity .2s ease;
+}
+
+/* Hover/active fix */
+.nav-arrow:hover,
+.nav-arrow:active {
+  filter: none !important;
+  transform: translateY(-50%) !important;
+  box-shadow: none !important;
+}
+
+/* If absolute positioned: top 50% + translateY ensures vertical center alignment */
+.gallery .nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* === Favorite icon placed above product name === */
+.title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+/* the heart button in the middle of the circle */
+.fav-top .wish-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  transition: filter .15s ease, background .15s ease, color .15s ease;
+}
+
+.fav-top .wish-btn svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.fav-top .wish-btn:hover { filter: brightness(.98); }
+
+.fav-top .wish-btn.active {
+  color: #e11d48;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.fav-top {
+  align-self: flex-end;
+}
+
+/* 1) Sticky OFF on mobile – don't get stuck in a column */
+@media (max-width: 768px) {
+  .details.sticky {
+    position: static;
+    top: auto;
+    height: auto;
+  }
+}
+
+/* 2) Main image height on mobile – not fixed px, but proportional */
+@media (max-width: 560px) {
+  .gallery .main-img img {
+    height: 62vw;
+    object-fit: cover;
+  }
+}
+
+/* --- Title + heart: mobile-friendly layout --- */
+.title-wrap {
+  position: relative;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* the heart is absolute, it does not push the address */
+.fav-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* the title is placed to the right of the heart */
+.title-wrap .title,
+.title-wrap h1 {
+  padding-right: 56px;
+  margin: 4px 0 8px;
+  min-width: 0;
+}
+
+/* the heart button must be round and of fixed size */
+.fav-top .wish-btn {
+  width: 42px; height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 0;
+}
+
+/* --- Price line: on mobile, In stock should be broken --- */
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.price-row .price { 
+  flex: 1 1 auto; 
+  min-width: 0;
+}
+
+.price-row .stock {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* On mobile, stock information should go in a separate line to the left */
+@media (max-width: 560px) {
+  .price-row .stock {
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 768px){
+  .details.sticky { position: static; top: auto; height: auto; }
+}
+
+/* --- Mobile: the main image should be much taller, keeping the ratio --- */
+@media (max-width: 600px) {
+  .gallery .main-img {
+    height: auto !important;
+    aspect-ratio: 3 / 4;
+  }
+
+  .gallery .main-img img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+
+  .skeleton .skeleton-img {
+    height: 85vw !important;
+  }
+}
+
+/* Recommended products header: SEE ALL goes in a separate row on mobile */
+.rel-bar {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 6px;
+}
+
+@media (min-width: 768px) {
+  .rel-bar {
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+  }
+}
+
+/* Accordion and right column do not cut off the dropdown */
+.details,
+.acc-wrap,
+.acc-item,
+.acc-item .acc-panel {
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* The custom select should have its own stacking context, and the menu should be above everything */
+.nselect {
+  position: relative;
+  z-index: 5;
+}
+.nselect .nselect-btn { position: relative; z-index: 6; }
+.nselect-menu {
+  position: absolute;
+  z-index: 9999;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+}
+
+/* Product details ( .desc ) should look like the rest of the accordion content */
+.acc-item .desc {
+  color: hsl(var(--muted-foreground));
+  line-height: 1.6;
+  padding-left: 18px;
+  margin: 0;
+}
+
+.acc-item .desc p { margin: 6px 0; }
+.acc-item .desc ul { margin: 6px 0; padding-left: 18px; list-style: disc; }
+.acc-item .desc ol { margin: 6px 0; padding-left: 18px; list-style: decimal; }
+.acc-item .desc b, 
+.acc-item .desc strong { color: hsl(var(--foreground)); }
+
+/* === Recommended products header – SEE ALL on a separate line, right aligned === */
+.rel-bar {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 6px;
+}
+
+/* "SEE ALL" should be right-aligned on the second line */
+.rel-bar a {
+  justify-self: end;
+  text-align: right;
+}
+
+/* can be in one line on a larger screen */
+@media (min-width: 768px) {
+  .rel-bar {
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+  }
+  .rel-bar a {
+    justify-self: auto;
+    text-align: right;
+  }
+}
+
+/* --- SCROLLERS: the menu should really be from the bottom AND the top --- */
+
+/* The entire right column and accordion should not be cut off and should have a low z-index */
+.details,
+.details .acc-wrap,
+.details .acc-item,
+.details .acc-item .acc-panel {
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Each custom select comes up with its own stacking context */
+.details .nselect {
+  position: relative;
+  z-index: 20;
+}
+
+/* The drop-down MENU goes even higher and accepts the click */
+.details .nselect .nselect-menu {
+  position: absolute;
+  z-index: 9999;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  pointer-events: auto;
+}
+
+/* The drop-down button should also be above its own menu */
+.details .nselect .nselect-btn {
+  position: relative;
+  z-index: 10000;
+}
+
+.details .nselect + .nselect {
+  z-index: 10;
+}
+
+/* --- FIX: Fit dropdown should be at the top and clickable --- */
+
+.acc-item { position: relative; }
+.acc-item.open { z-index: 2000; }
+.acc-item .acc-panel { position: relative; }
+.acc-item.open .acc-panel {
+  overflow: visible;
+  transform: none !important;
+}
+
+/* Fit comes up with its own stacking context */
+.size-reco .nselect { position: relative; z-index: 3000; }
+.size-reco .nselect .nselect-menu {
+  position: absolute;
+  z-index: 99999;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  pointer-events: auto;
+}
+
+.size-reco .nselect + .nselect { z-index: 1000; }
+
+/* --- RECOMMENDED PRODUCTS --- */
+.rel-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.rel-name {
+  margin: 6px 0 2px 0;
+  min-height: 32px;
+}
+
+.rel-price {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  height: auto;
+}
+
+.rel-price .old {
+  color: hsl(var(--muted-foreground));
+  text-decoration: line-through;
+  font-size: 13px;
+}

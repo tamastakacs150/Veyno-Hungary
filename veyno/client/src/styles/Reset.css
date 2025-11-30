@@ -1,0 +1,16 @@
+/*client/src/styles/Reset.css/*
+
+/* ===== RESET ===== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+img, video { max-width: 100%; height: auto; }
+
+:root { color-scheme: light; }

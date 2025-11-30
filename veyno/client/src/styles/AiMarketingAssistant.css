@@ -1,0 +1,19 @@
+/*client/src/styles/AiMarketingAssistant.css*/
+.hero-slider .hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2.5rem;
+  width: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: rgba(17,17,17,0.8);
+  color: white;
+  z-index: 50;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform .15s ease;
+}
+.hero-slider .hero-nav:hover { transform: translateY(-50%) scale(1.05); }
+.hero-slider .hero-nav.prev { left: .5rem; }
+.hero-slider .hero-nav.next { right: .5rem; }

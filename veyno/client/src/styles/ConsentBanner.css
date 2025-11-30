@@ -1,0 +1,95 @@
+/*client/src/styles/ConsentBanner.css*/
+
+/* ====== VEYNO — Consent Banner Theme (matching Footer) ====== */
+
+.consent-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 5%) 0%,
+    hsl(0 0% 12%) 100%
+  );
+  
+  border-top: 1px solid hsl(0 0% 20%);
+  color: hsl(0 0% 98%);
+  
+  padding: 1.25rem 0;
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  
+  box-shadow: 0 -10px 40px -10px hsl(0 0% 0% / 0.6);
+  
+  animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.consent-banner p {
+  color: hsl(0 0% 85%);
+  margin: 0;
+}
+
+.consent-button {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 100%),
+    hsl(0 0% 95%)
+  );
+  color: hsl(0 0% 8%);
+  
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  
+  font-weight: 600;
+  font-size: 0.9375rem;
+  
+  cursor: pointer;
+  
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  box-shadow: 
+    0 0 30px hsl(0 0% 100% / 0.15),
+    0 4px 20px hsl(0 0% 0% / 0.1);
+}
+
+.consent-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 40px hsl(0 0% 100% / 0.25),
+    0 6px 30px hsl(0 0% 0% / 0.15);
+}
+
+.consent-button:active {
+  transform: translateY(0);
+}
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .consent-banner {
+    padding: 1rem 0;
+  }
+  
+  .consent-banner p {
+    text-align: center;
+    font-size: 0.875rem;
+  }
+  
+  .consent-button {
+    width: 100%;
+    max-width: 280px;
+  }
+}

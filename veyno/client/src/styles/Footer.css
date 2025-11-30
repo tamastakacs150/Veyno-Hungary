@@ -1,0 +1,139 @@
+/*client/src/styles/Footer.css */
+
+/* ====== VEYNO — Footer Standalone Theme ====== */
+
+/* Footer Design System - Black & White */
+:root {
+  --footer-bg: 0 0% 8%;
+  --footer-gradient-from: 0 0% 5%;
+  --footer-gradient-to: 0 0% 12%;
+  --footer-border: 0 0% 20%;
+  --footer-text: 0 0% 98%;
+  --footer-text-muted: 0 0% 60%;
+  --footer-accent: 0 0% 100%;
+  --footer-accent-glow: 0 0% 95%;
+  --footer-input-bg: 0 0% 15%;
+  --footer-input-border: 0 0% 25%;
+  --footer-glass: 0 0% 18%;
+
+  /* Modern Shadows */
+  --shadow-elegant: 0 10px 40px -10px hsl(222 47% 11% / 0.4);
+  --shadow-glow: 0 0 30px hsl(217 91% 60% / 0.15);
+  --shadow-subtle: 0 4px 20px hsl(222 47% 11% / 0.1);
+
+  /* Transitions */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.site-footer {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--footer-gradient-from)) 0%,
+    hsl(var(--footer-gradient-to)) 100%
+  );
+  color: hsl(var(--footer-text));
+  border-top: 1px solid hsl(var(--footer-border));
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+}
+
+/* Text */
+.site-footer p,
+.site-footer h4,
+.site-footer li,
+.site-footer a {
+  color: hsl(var(--footer-text-muted));
+}
+
+.site-footer h4 {
+  color: hsl(var(--footer-text));
+}
+
+.site-footer a:hover {
+  color: hsl(var(--footer-accent));
+}
+
+/* Newsletter input */
+.site-footer input {
+  background-color: transparent !important;
+  border: 1px solid hsl(var(--footer-input-border));
+  color: hsl(var(--footer-text));
+  box-shadow: var(--shadow-subtle);
+}
+
+.site-footer input::placeholder {
+  color: hsl(var(--footer-text-muted));
+}
+
+/* Newsletter button */
+.site-footer button {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--footer-accent)),
+    hsl(var(--footer-accent-glow))
+  );
+  color: black;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Social buttons */
+.site-footer .social-btn {
+  background-color: hsl(var(--footer-glass));
+  border: 1px solid hsl(var(--footer-input-border));
+  color: hsl(var(--footer-text-muted));
+  transition: var(--transition-smooth);
+}
+
+.site-footer .social-btn:hover {
+  color: hsl(var(--footer-accent));
+  box-shadow: 0 0 20px hsl(var(--footer-accent-glow) / 0.3);
+}
+
+/* Remove default blue focus outline on email input */
+.site-footer input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--footer-accent) / 0.4);
+  border-color: hsl(var(--footer-input-border));
+}
+
+/* ---- Footer link underline ---- */
+.site-footer .link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.site-footer .link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 0;
+  background-color: hsl(var(--footer-accent));
+  transition: width 0.3s ease;
+}
+
+.site-footer a:hover .link-underline::after {
+  width: 100%;
+}
+
+/* ==== Scroll animation: bottom-to-top float ==== */
+
+@keyframes footer-fade-up {
+  0% { opacity: 0; transform: translateY(40px); }
+  60% { opacity: 1; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Invisible by default until scrolled */
+.site-footer:not(.animate-in-view) .footer-anim-item {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* On activation */
+.site-footer.animate-in-view .footer-anim-item {
+  animation: footer-fade-up 900ms cubic-bezier(.22,.61,.36,1) both;
+  /* Each element arrives with its own delay, increasing from top to bottom */
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
