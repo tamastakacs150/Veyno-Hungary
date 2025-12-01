@@ -1,0 +1,55 @@
+services:
+  # --- ÚJ SZOLGÁLTATÁS: CLOUDFLARE TUNNEL ---
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: veyno-tunnel
+    restart: always
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      args:
+        # A build folyamat most már a .env-ben megadott DOMAIN_URL-t kapja meg
+        - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY}
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: veyno-webshop
+    restart: always
+    # NINCS "ports" szekció!
+    # A konténer nem nyit kaput a külvilágra, csak a tunnel látja belülről.
+    expose:
+      - "5555"
+    environment:
+      - NODE_ENV=production
+      - PORT=5555
+      - MONGO_URI=mongodb://mongo:27017/veyno
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_URL=${CLIENT_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - API_URL=${API_URL}
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    volumes:
+      - ./client/public/products:/app/client/public/products
+      - ./client/public/generated:/app/client/public/generated
+
+  mongo:
+    image: mongo:6
+    container_name: veyno-mongo
+    restart: always
+    # A mongo portja maradhat, ha el akarod érni helyi klienssel (pl. Compass)
+    # Ha ezt is el akarod rejteni, töröld a ports részt innen is.
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
