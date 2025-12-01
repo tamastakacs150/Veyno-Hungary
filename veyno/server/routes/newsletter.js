@@ -33,29 +33,28 @@ router.get("/open/:id", async (req, res) => {
 });
 
 // Simple admin protection: X-Newsletter-Token header
-function requireNewsletterAdmin(req, res, next) {
-    const t = req.headers["x-newsletter-token"];
-    if (t && process.env.NEWSLETTER_ADMIN_TOKEN && t === process.env.NEWSLETTER_ADMIN_TOKEN) return next();
-    return res.status(401).json({ msg: "Unauthorized" });
+function ensureAdmin(req, res, next) {
+    if (!req.user || req.user.role !== 'admin') { 
+        return res.status(403).json({ msg: "Access denied. Admins only." });
+    }
+    next();
 }
 
-// Subscribe + list
-router.post("/", subscribe);     // POST /api/newsletter
-//router.get("/", requireNewsletterAdmin, listAll);   // GET  /api/newsletter
-router.get("/status", authMiddleware, status);   // GET  /api/newsletter/status?email=...
+// Publikus végpontok (bárki elérheti)
+router.post("/", subscribe);
+router.get("/unsubscribe", unsubscribe);
+router.post("/unsubscribe", unsubscribe);
 
-// Manual sending from body (subject + html/text)
-router.post("/send", requireNewsletterAdmin, sendNewsletter);
+// Bejelentkezett felhasználók (bárki, akinek van fiókja)
+router.get("/status", authMiddleware, status);
 
-// from preview file (admin only)
-router.get("/preview", requireNewsletterAdmin, previewFromFile);
+// --- ADMIN VÉGPONTOK ---
+// Itt láncoljuk: először authMiddleware (beléptet), utána ensureAdmin (jogosultság)
+router.post("/send", authMiddleware, ensureAdmin, sendNewsletter);
 
-// send from file (admin only)
-router.post("/send-file", requireNewsletterAdmin, sendFromFile);
-
-//Unsubscribe
-router.get("/unsubscribe", unsubscribe); // GET /api/newsletter/unsubscribe
-router.post("/unsubscribe", unsubscribe); // POST /api/newsletter/unsubscribe
+// A fájl alapú küldést is érdemes védeni ugyanígy:
+router.get("/preview", authMiddleware, ensureAdmin, previewFromFile);
+router.post("/send-file", authMiddleware, ensureAdmin, sendFromFile);
 
 export default router;
 
