@@ -14,7 +14,7 @@ import api from "@/utils/api";
 import resolveImg, { candidatesFor } from "@/utils/resolveImg";
 import { useStripe, useElements, PaymentRequestButtonElement, CardNumberElement, CardExpiryElement, CardCvcElement } from "@stripe/react-stripe-js";
 import { useCurrency } from "@/context/CurrencyContext";
-import "../styles/checkout.css";
+import "../styles/Checkout.css";
 
 type CartItem = {
   _id?: string;
