@@ -1,8 +1,0 @@
-{
-    auto_https off
-}
-
-https://localhost:443 {
-    tls /etc/caddy/certs/localhost+2.pem /etc/caddy/certs/localhost+2-key.pem
-    reverse_proxy veyno-webshop:5555
-}
