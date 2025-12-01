@@ -17,8 +17,6 @@ type Stats = {
 export default function NewsletterManager() {
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
-  const [adminToken, setAdminToken] = useState<string>(() => localStorage.getItem("NEWSLETTER_ADMIN_TOKEN") || "");
-  const authHeaders = useMemo(() => (adminToken ? { "X-Newsletter-Token": adminToken } : {}), [adminToken]);
   const [sending, setSending] = useState(false);
   const [stats, setStats] = useState<Stats>({
     totalSubscribers: 0,
@@ -52,12 +50,12 @@ export default function NewsletterManager() {
 
     setSending(true);
     try {
-      const response = await fetch("/api/newsletter/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders },
-        credentials: "include", 
-        body: JSON.stringify({ subject, html: content }),
-      });
+        const response = await fetch("/api/newsletter/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ subject, html: content }),
+        });
 
 
       if (!response.ok) {
