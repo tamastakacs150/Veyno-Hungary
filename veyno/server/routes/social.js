@@ -5,12 +5,13 @@ import { uploadBuffer } from "../services/upload.js";
 import { publishInstagram } from "../services/instagram.js";
 import { publishTikTok, getTikTokStatus, handleTikTokWebhook } from "../services/tiktok.js";
 import { validateSafeUrl } from "../utils/validateUrl.js";
+import requireAdmin from "../middleware/requireAdmin.js";
 
 const router = express.Router();
 
 
 // POST /api/social/publish
-router.post("/publish", async (req, res, next) => {
+router.post("/publish", requireAdmin, async (req, res, next) => {
 try {
 const { platforms = [], caption = "", hashtags = [], images = [] } = req.body;
 if (!images?.length) return res.status(400).json({ ok:false, error:"images[] required" });
@@ -52,7 +53,7 @@ next(e);
 
 
 // GET /api/social/tiktok/status?id=
-router.get("/tiktok/status", async (req, res, next) => {
+router.get("/tiktok/status", requireAdmin, async (req, res, next) => {
 try {
 const { id } = req.query;
 if (!id) return res.status(400).json({ ok:false, error:"id required" });
