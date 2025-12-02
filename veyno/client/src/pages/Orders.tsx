@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/context/CurrencyContext";
 import api from "../utils/api.js";
 import resolveImg, { candidatesFor } from "../utils/resolveImg.js";
-import "../styles/cart.css";
+import "../styles/Cart.css";
 import "../styles/Orders.css";
 
 interface OrderItem {

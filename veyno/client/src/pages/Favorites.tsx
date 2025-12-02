@@ -9,7 +9,7 @@ import api from "../utils/api.js";
 import useWishlist from "../hooks/useWishlist";
 import { useCart } from "@/context/CartContext";
 import resolveImg, { candidatesFor } from "../utils/resolveImg.js";
-import "../styles/cart.css";
+import "../styles/Cart.css";
 import "../styles/Favorites.css";
 
 interface Product {

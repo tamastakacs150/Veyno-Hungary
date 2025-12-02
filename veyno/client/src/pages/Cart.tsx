@@ -8,7 +8,7 @@ import api from "@/utils/api";
 import { useCart } from "@/context/CartContext";
 import resolveImg, { candidatesFor } from "@/utils/resolveImg";
 import { useAuth } from "@/auth/AuthContext";
-import "../styles/cart.css";
+import "../styles/Cart.css";
 import { useCurrency } from "@/context/CurrencyContext";
 
 type CartItem = {
