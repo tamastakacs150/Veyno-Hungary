@@ -86,7 +86,7 @@ export default function Chatbot() {
       const { data } = await api.post("/ai/support", { message: text });
       setMessages((m) => [...m, { from: "ai", text: data?.reply || "…" }]);
     } catch {
-      setMessages((m) => [...m, { from: "ai", text: "Sorry, an error occurred." }]);
+      setMessages((m) => [...m, { from: "ai", text: "To use the assistant, you have to login first." }]);
     } finally {
       setLoading(false);
     }

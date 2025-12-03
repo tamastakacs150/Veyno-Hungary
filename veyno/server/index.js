@@ -1,4 +1,4 @@
-﻿//server/index.js
+//server/index.js
 import express from 'express';
 import cors from "cors";
 import dotenv from 'dotenv';
@@ -16,6 +16,7 @@ import Product from './models/Product.js';
 import Order from './models/Order.js';
 import cartRoutes from './routes/cart.js';
 import adminRoutes from "./routes/admin.js";
+import returnsRoutes from "./routes/returns.js";
 import checkoutRouter from "./routes/checkout.js";
 import requireAdmin from "./middleware/requireAdmin.js";
 import ContactMessage from "./models/ContactMessage.js";
@@ -1068,7 +1069,7 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 // --- FIXED CHECKOUT HANDLER (with sale prices) ---
 app.post("/api/checkout", async (req, res) => {
     try {
-        const userId = req.user?._id || null;
+        const userId = req.userId || req.user?.id || null;
         const {
             items = [],
             customer = {},
@@ -1913,7 +1914,7 @@ app.post('/api/ai/support', authMiddleware, async (req, res) => {
             order: summary,
         });
     } catch (err) {
-        console.error('❌ /ai/support error:', err);
+        console.error('/ai/support error:', err);
         return res.status(500).json({
             ok: false,
             reply: `Oops, I can't access the AI ​​service right now. Please try again later or write to us on the Contact page.`,
@@ -1948,6 +1949,17 @@ app.post('/api/chat', publicLimiter, async (req, res) => {
     }
 });
 
+app.get(/.*/, (req, res, next) => {
+    if (req.path.startsWith("/api") || req.path === "/webhook") return next();
+
+    const requestedFilePath = path.join(clientDist, req.path);
+    if (fs.existsSync(requestedFilePath) && !fs.lstatSync(requestedFilePath).isDirectory()) {
+         return next();
+    }
+
+    res.sendFile(path.join(clientDist, "index.html"));
+});
+
 // Admin route
 app.use("/api/admin", requireAdmin, adminRoutes);
 
@@ -1962,6 +1974,9 @@ app.use("/api/social", authMiddleware, requireAdmin, socialRouter);
 
 //Serve as frontend under /products
 app.use("/api/products", express.static(PRODUCTS_DIR));
+
+//Returns 
+app.use("/api/returns", returnsRoutes);
 
 //Newsletter path
 app.use("/api/newsletter", publicLimiter, newsletterRouter);

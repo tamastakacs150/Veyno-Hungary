@@ -13,6 +13,7 @@ import Newsletter from "../models/Newsletter.js";
 import NewsletterLog from "../models/NewsletterLog.js";
 import ContactMessage from "../models/ContactMessage.js";
 import EmailLog from "../models/EmailLog.js";
+import ReturnRequest from "../models/ReturnRequest.js";
 import Coupon from "../models/Coupon.js";
 import { sendCustomEmail, buildCustomEmailHtml, sendReplyEmail } from "../mailer/mailer.js";
 
@@ -123,6 +124,70 @@ router.patch("/orders/:id/status", async (req, res) => {
   } catch (e) {
     console.error("ADMIN order status error:", e);
     res.status(500).json({ error: "Order status update failed." });
+  }
+});
+
+router.get("/returns", async (req, res) => {
+  try {
+    const { status, page = 1, limit = 20 } = req.query;
+
+    const q = {};
+    if (status && status !== "all") {
+      q.status = status;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [items, total] = await Promise.all([
+      ReturnRequest.find(q)
+        .populate("order")
+        .populate("user", "email name")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .lean(),
+      ReturnRequest.countDocuments(q),
+    ]);
+
+    return res.json({
+      items,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / Number(limit) || 1),
+    });
+  } catch (err) {
+    console.error("ADMIN returns list error:", err);
+    return res.status(500).json({ error: "Failed to load return requests." });
+  }
+});
+
+router.patch("/returns/:id", async (req, res) => {
+  try {
+    const { status, adminNote } = req.body || {};
+    const valid = ["pending", "approved", "rejected", "received", "refunded"];
+
+    if (status && !valid.includes(status)) {
+      return res.status(400).json({ error: "Invalid status." });
+    }
+
+    const upd = await ReturnRequest.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...(status ? { status } : {}),
+        ...(typeof adminNote === "string" ? { adminNote } : {}),
+      },
+      { new: true }
+    )
+      .populate("order")
+      .populate("user", "email name")
+      .lean();
+
+    if (!upd) return res.status(404).json({ error: "Return request not found." });
+
+    return res.json(upd);
+  } catch (err) {
+    console.error("ADMIN returns update error:", err);
+    return res.status(500).json({ error: "Failed to update return request." });
   }
 });
 

@@ -1,7 +1,9 @@
 //client/src/pages/Orders.tsx
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Package, ArrowLeft, Calendar, CreditCard, Tag } from "lucide-react";
+import { Package, ArrowLeft, Calendar, CreditCard, Tag, RotateCcw } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +14,7 @@ import "../styles/Cart.css";
 import "../styles/Orders.css";
 
 interface OrderItem {
-  productId?: { name?: string; price?: number; [k: string]: any };
+  productId?: { name?: string; price?: number;[k: string]: any };
   name?: string;
   quantity?: number;
   unitPrice?: number;
@@ -34,6 +36,8 @@ interface Order {
   discount?: number;
   coupon?: string;
   couponCode?: string;
+  hasActiveReturn?: boolean; // ÚJ MEZŐK A RETURN ÁLLAPOTOKHOZ
+  returnStatus?: string | null; // ÚJ MEZŐK A RETURN ÁLLAPOTOKHOZ
 }
 
 export default function Orders() {
@@ -42,19 +46,55 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { format, rates } = useCurrency();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [returnReason, setReturnReason] = useState("");
+  const [returnSubmitting, setReturnSubmitting] = useState(false);
+
+  // ÚJ FÜGGVÉNY: A rendelések és a return állapotok betöltésére/frissítésére
+  const loadOrders = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      // 1. Rendelések lekérése
+      const { data: ordersData } = await api.get("/me/orders");
+      const ordersList: Order[] = Array.isArray(ordersData) ? ordersData : [];
+
+      // 2. Return állapotok ellenőrzése minden rendeléshez
+      const checks = ordersList.map(o =>
+        // FONTOS: Feltételezi, hogy a /returns/check/:orderId végpont létezik!
+        api.get(`/returns/check/${o._id}`)
+          .then(res => ({
+            id: o._id,
+            hasActiveReturn: res.data?.hasActiveReturn || false,
+            returnStatus: res.data?.returnStatus || null,
+          }))
+          .catch(() => ({ id: o._id, hasActiveReturn: false, returnStatus: null }))
+      );
+
+      const returnStatuses = await Promise.all(checks);
+      const statusMap = new Map(returnStatuses.map(s => [s.id, s]));
+
+      const finalOrders = ordersList.map(o => ({
+        ...o,
+        hasActiveReturn: statusMap.get(o._id)?.hasActiveReturn,
+        returnStatus: statusMap.get(o._id)?.returnStatus,
+      }));
+
+      setOrders(finalOrders);
+    } catch (e: any) {
+      const msg = e?.response?.data?.error || "Error loading orders.";
+      setError(msg);
+      if (e?.response?.status === 401) navigate("/login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   /* === GET: /me/orders, 401 -> login === */
   useEffect(() => {
-    setLoading(true);
-    api
-      .get("/me/orders")
-      .then(({ data }: any) => setOrders(Array.isArray(data) ? data : []))
-      .catch((e: any) => {
-        const msg = e?.response?.data?.error || "Error loading orders.";
-        setError(msg);
-        if (e?.response?.status === 401) navigate("/login");
-      })
-      .finally(() => setLoading(false));
+    loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const normalizeUSD = (raw: number) => {
@@ -81,6 +121,40 @@ export default function Orders() {
       processing: "Processing",
     };
     return status ? (labels[status] || status) : "-";
+  };
+
+  const handleSubmitReturn = async () => {
+    if (!selectedOrder) return;
+    try {
+      setReturnSubmitting(true);
+      await api.post("/returns", {
+        orderId: selectedOrder._id,
+        reason: returnReason,
+      });
+      setReturnReason("");
+      setSelectedOrder(null);
+
+      // SIKERES KÜLDÉS UTÁN: Frissítjük a rendeléseket
+      await loadOrders(); 
+      
+      alert("Return request created successfully. The return status has been updated.");
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.response?.data?.msg || "Failed to create return request.");
+    } finally {
+      setReturnSubmitting(false);
+    }
+  };
+
+  const getReturnStatusColor = (status: string) => {
+      const colors: Record<string, string> = {
+        pending: "bg-blue-500/5 px-4 py-2 rounded-lg border border-blue-500/20 text-blue-700 dark:text-blue-400",
+        approved: "bg-green-500/5 px-4 py-2 rounded-lg border border-green-500/20 text-green-700 dark:text-green-400",
+        rejected: "bg-red-500/5 px-4 py-2 rounded-lg border border-red-500/20 text-red-700 dark:text-red-400",
+        received: "bg-purple-500/5 px-4 py-2 rounded-lg border border-purple-500/20 text-purple-700 dark:text-purple-400",
+        refunded: "bg-green-500/5 px-4 py-2 rounded-lg border border-green-500/20 text-green-700 dark:text-green-400",
+      };
+      return colors[status] || "bg-muted/50 px-4 py-2 rounded-lg border border-border/50 text-muted-foreground";
   };
 
   return (
@@ -149,6 +223,10 @@ export default function Orders() {
               const coupon = o?.coupon || o?.couponCode || null;
               const hasCoupon = !!(coupon && String(coupon).trim());
 
+              // ÚJ: Feltételek a gomb megjelenítéséhez
+              const isDelivered = o.status === "delivered";
+              const canRequestReturn = isDelivered && !o.hasActiveReturn;
+
               return (
                 <Card
                   key={id}
@@ -190,6 +268,66 @@ export default function Orders() {
                           {hasCoupon ? String(coupon).toUpperCase() : "DISCOUNT"}
                         </span>
                         <span className="ml-auto text-primary font-bold">-{format(discount)}</span>
+                      </div>
+                    )}
+
+                    {isDelivered && (
+                      <div className="flex justify-end">
+                        
+                        {/* ÚJ: Return Státusz kijelzése, ha van aktív kérés */}
+                        {o.hasActiveReturn && o.returnStatus ? (
+                           <div className={`flex items-center gap-2 text-sm ${getReturnStatusColor(o.returnStatus)}`}>
+                                <RotateCcw className="w-4 h-4" />
+                                <span>Return Status: </span>
+                                <span className="font-bold">{o.returnStatus.toUpperCase()}</span>
+                            </div>
+                        ) : canRequestReturn && (
+                            // MÓDOSÍTOTT: Gomb csak akkor, ha `canRequestReturn` igaz
+                            <Dialog
+                              open={selectedOrder?._id === id}
+                              onOpenChange={(open) => {
+                                if (open) {
+                                  setSelectedOrder(o);
+                                } else {
+                                  setSelectedOrder(null);
+                                  setReturnReason("");
+                                }
+                              }}
+                            >
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="gap-2">
+                                  <RotateCcw className="w-4 h-4" />
+                                  Request return
+                                </Button>
+                              </DialogTrigger>
+
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Request a return</DialogTitle>
+                                </DialogHeader>
+                                <Textarea
+                                  value={returnReason}
+                                  onChange={(e) => setReturnReason(e.target.value)}
+                                  placeholder="Reason for return..."
+                                  rows={4}
+                                />
+                                <div className="flex justify-end gap-2 mt-3">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedOrder(null);
+                                      setReturnReason("");
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button onClick={handleSubmitReturn} disabled={returnSubmitting}>
+                                    {returnSubmitting ? "Submitting..." : "Submit"}
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          )}
                       </div>
                     )}
 

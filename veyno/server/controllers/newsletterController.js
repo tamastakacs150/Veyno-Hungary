@@ -68,31 +68,38 @@ export async function status(req, res) {
 export async function subscribe(req, res) {
   try {
     const { email } = req.body || {};
-    if (!email) return res.status(400).json({ msg: "Email is required" });
+    if (!email) {
+      return res.status(400).json({ msg: "Email is required" });
+    }
 
     const normalized = String(email).trim().toLowerCase();
     const unsubscribeToken = generateUnsubscribeToken();
 
-    await Newsletter.create({
-      email: normalized,
-      unsubscribeToken,
-      unsubscribeTokenExpiresAt: new Date(
-        Date.now() + 1000 * 60 * 60 * 24 * 365 * 5
-      ), // pl. 5 év
-    });
+    try {
+      await Newsletter.create({
+        email: normalized,
+        unsubscribeToken,
+        unsubscribeTokenExpiresAt: new Date(
+          Date.now() + 1000 * 60 * 60 * 24 * 365 * 5
+        ), // pl. 5 év
+      });
 
-    // Welcome email with coupon
-    await sendWelcomeEmail(normalized);
-
-    return res.json({ msg: "Successful subscription! Coupon code sent via e-mail." });
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(200).json({ msg: "You are already subscribed!" });
+      await sendWelcomeEmail(normalized);
+    } catch (err) {
+      if (err.code !== 11000) {
+        console.error("Newsletter subscribe error:", err);
+        return res.status(500).json({ msg: "Subscription failed. Please try again later." });
+      }
     }
-    return res.status(500).json({ msg: "Error saving" });
+
+    return res.json({
+      msg: "If your subscription is successful, your coupon code will be sent to you via email.",
+    });
+  } catch (err) {
+    console.error("Newsletter subscribe outer error:", err);
+    return res.status(500).json({ msg: "Subscription failed. Please try again later." });
   }
 }
-
 
 export async function listAll(_req, res) {
   const docs = await Newsletter.find().sort({ createdAt: -1 });

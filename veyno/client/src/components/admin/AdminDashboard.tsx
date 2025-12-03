@@ -1,7 +1,7 @@
 //client/src/components/admin/AdminDashboard.tsx
 import { useState, Suspense, lazy } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { LayoutDashboard, Package, ShoppingCart, Percent, Mail, Send, BrainCircuit, Inbox } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Percent, Mail, Send, BrainCircuit, Inbox, RotateCcw } from "lucide-react";
 import "../../styles/AdminDashboard.css";
 
 const DashboardHome = lazy(() => import("@/components/admin/DashboardHome"));
@@ -12,6 +12,7 @@ const NewsletterManager = lazy(() => import("@/components/admin/NewsletterManage
 const CustomerEmailManager = lazy(() => import("@/components/admin/CustomerEmailManager"));
 const AiMarketingAssistant = lazy(() => import("@/components/admin/AiMarketingAssistant"));
 const MessagesManager = lazy(() => import("@/components/admin/MessagesManager"));
+const ReturnsManager = lazy(() => import("@/components/admin/ReturnsManager"));
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState("home");
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="flex flex-wrap h-auto w-full max-w-6xl gap-2 mb-8 [&>button>svg]:h-4 [&>button>svg]:w-4 [&>button>svg]:shrink-0">
             <TabsTrigger value="home"><LayoutDashboard className="h-4 w-4" />Home</TabsTrigger>
+            <TabsTrigger value="returns"><RotateCcw className="h-4 w-4" />Returns</TabsTrigger>
             <TabsTrigger value="orders"><ShoppingCart className="h-4 w-4" />Orders</TabsTrigger>
             <TabsTrigger value="products"><Package className="h-4 w-4" />Products</TabsTrigger>
             <TabsTrigger value="sales"><Percent className="h-4 w-4" />Sales</TabsTrigger>
@@ -44,6 +46,7 @@ export default function AdminDashboard() {
             <TabsContent value="home" className="admin-content"><DashboardHome /></TabsContent>
             <TabsContent value="orders" className="admin-content"><OrdersManager /></TabsContent>
             <TabsContent value="products" className="admin-content"><ProductsManager /></TabsContent>
+            <TabsContent value="returns" className="admin-content"><ReturnsManager /></TabsContent>
             <TabsContent value="sales" className="admin-content"><SalesManager /></TabsContent>
             <TabsContent value="newsletter" className="admin-content"><NewsletterManager /></TabsContent>
             <TabsContent value="email" className="admin-content"><CustomerEmailManager /></TabsContent>
