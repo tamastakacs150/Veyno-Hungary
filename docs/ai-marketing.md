@@ -16,7 +16,7 @@ caption, image and short video — and can publish the result to Instagram.
         |                           |                           |
    DeepSeek chat              Gemini image                RunwayML video
    caption + hashtags         gemini-2.5-flash-image      text_to_video
-   JSON mode                  streamed response           async task + webhook
+   JSON mode                  streamed response           async task + polling
         |                           |                           |
         +---------------------------+---------------------------+
                                     |
@@ -38,10 +38,13 @@ photo rather than the description alone. Local files under `public/products/...`
 disk; only genuinely remote URLs go through HTTP, and those are checked by `validateSafeUrl()`
 with a size cap and a short timeout so the fetch cannot be pointed at internal addresses.
 
-**RunwayML — video.** Video generation takes minutes, so it cannot be one request. The endpoint
-is split into three: `POST /video/start` submits the task and returns a `taskId`,
-`GET /video/status/:id` polls it, and a webhook receives the result when it is ready. The
-interesting failure modes here are about state, not about the model.
+**RunwayML — video.** Video generation takes minutes, so it cannot be one request.
+`POST /video/start` submits the task and returns a `taskId`, and `GET /video/status/:id` polls
+it — this is the path that actually works. A webhook endpoint is registered at
+`/api/ai-marketing/runway/webhook`, but its handler is currently a stub: it accepts the callback
+and returns 200 without persisting the result, so nothing depends on it yet. Finishing it means
+storing the result against the task and verifying the callback signature, since that route is
+necessarily unauthenticated.
 
 **Publishing.** The Instagram Graph API needs two calls: first create a media container with the
 image URL and caption, then publish that container. The image therefore has to be reachable at a
@@ -50,12 +53,13 @@ for.
 
 ## Endpoints
 
-| Method | Endpoint                     | Purpose                              |
-|--------|------------------------------|--------------------------------------|
-| POST   | `/api/ai/generate-post`      | Caption, description and hashtags    |
-| POST   | `/api/ai/generate-image`     | Product image from a prompt          |
-| POST   | `/api/ai/video/start`        | Start video generation, returns id   |
-| GET    | `/api/ai/video/status/:id`   | Poll generation status               |
+| Method | Endpoint                               | Purpose                           |
+|--------|----------------------------------------|-----------------------------------|
+| POST   | `/api/ai-marketing/generate-post`      | Caption, description and hashtags |
+| POST   | `/api/ai-marketing/generate-image`     | Product image from a prompt       |
+| POST   | `/api/ai-marketing/video/start`        | Start video generation, returns id|
+| GET    | `/api/ai-marketing/video/status/:id`   | Poll generation status            |
+| POST   | `/api/ai-marketing/runway/webhook`     | Runway callback (stub, public)    |
 
 ## Configuration
 
@@ -66,13 +70,23 @@ and image hosting needs the `S3_*` variables and `CDN_PUBLIC_BASE`.
 No secrets belong in this repository — `.env` is gitignored, and `env.example` lists variable
 names only.
 
+## Access control
+
+All generation routes sit behind `authMiddleware` + `requireAdmin`, so only an administrator can
+spend API credits. The separate customer-facing assistant at `/api/ai/support` is scoped the
+other way: it requires a logged-in user and filters orders by `{ user: req.user._id }` or the
+account's own email, so a customer cannot look up somebody else's order by guessing an order
+number.
+
 ## Known limitations
 
 - **No cost controls.** Every generation calls a paid API and nothing caps how often that can
   happen. There is request rate limiting on the server, but no per-user quota or spend limit.
   This is the most important thing to fix before anyone else uses it.
-- **Polling, not events.** Video status is polled from the client; the webhook exists but the
-  client does not subscribe to it, so a long generation means a long series of requests.
+- **The webhook is a stub.** `runwayWebhook` destructures the callback body and discards it.
+  Video results are only ever obtained by polling, so a long generation means a long series of
+  requests. The handler also does not verify the callback signature — that has to be added before
+  it is wired up, because the route is public by necessity.
 - **No retries.** If a provider returns an error the endpoint reports it and stops. There is no
   queue and no retry with backoff, so a transient failure loses the generation.
 - **No review step.** Generated content can be published without approval, which is fine for a
