@@ -5,7 +5,8 @@ routes in `server/routes/aiMarketing.js`, the publishing services in `server/ser
 admin UI in `client/src/components/admin/AiMarketingAssistant.tsx`.
 
 It takes a product from the shop database and generates a complete social media post for it —
-caption, image and short video — and can publish the result to Instagram.
+caption, image and short video. Publishing that result to Instagram or TikTok is started but
+not finished — see below.
 
 ## Flow
 
@@ -46,10 +47,12 @@ and returns 200 without persisting the result, so nothing depends on it yet. Fin
 storing the result against the task and verifying the callback signature, since that route is
 necessarily unauthenticated.
 
-**Publishing.** The Instagram Graph API needs two calls: first create a media container with the
-image URL and caption, then publish that container. The image therefore has to be reachable at a
-public URL before publishing — that is what the S3-compatible storage and `CDN_PUBLIC_BASE` are
-for.
+**Publishing — unfinished.** The intended flow is the Instagram Graph API's two calls: first
+create a media container with the image URL and caption, then publish that container. That is why
+the image has to be reachable at a public URL first, which is what the S3-compatible storage and
+`CDN_PUBLIC_BASE` are for. The server routes (`/api/social/publish`, the TikTok status endpoint)
+and the service functions exist, but this path has never been run end to end against a real
+account, so treat it as scaffolding rather than a working feature.
 
 ## Endpoints
 
@@ -89,6 +92,7 @@ number.
   it is wired up, because the route is public by necessity.
 - **No retries.** If a provider returns an error the endpoint reports it and stops. There is no
   queue and no retry with backoff, so a transient failure loses the generation.
-- **No review step.** Generated content can be published without approval, which is fine for a
-  personal shop and would not be for a real brand account.
-- Tested with a single Instagram Professional account; the TikTok path is less complete.
+- **No review step.** Nothing sits between generation and the publish call, which would matter
+  if the publishing path were finished.
+- **Publishing is untested.** The generation side (text, image, video) works; the publish side has
+  not been verified against a live Instagram or TikTok account.
