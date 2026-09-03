@@ -209,7 +209,7 @@ export default function Orders() {
                           >
                             <div className="aspect-square rounded-lg bg-background/50 overflow-hidden">
                               <img
-                                src={resolveImg(p, 1)}
+                                src={resolveImg(p)}
                                 alt={name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {

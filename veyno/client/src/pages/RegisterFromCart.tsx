@@ -117,7 +117,7 @@ export default function Register() {
                                 setErr("");
                                 setMsg("");
                                 try {
-                                    await loginWithGoogle(resp.credential);
+                                    await loginWithGoogle(resp.credential ?? "");
 
                                     setMsg("Successful login with Google account.");
                                     setTimeout(() => nav("/checkout", {
@@ -335,7 +335,7 @@ const S: Record<string, CSSProperties> = {
         marginBottom: 12,
         wordWrap: "break-word",
         overflowWrap: "break-word",
-        hiteSpace: "normal",
+        whiteSpace: "normal",
     },
     bottomRow: {
         display: "flex",

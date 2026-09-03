@@ -2,7 +2,14 @@
 import { useMemo, useRef } from "react";
 import { StarIcon } from "../icons/icons";
 
-export default function Stars({ value, count, size = 20, seed }) {
+interface StarsProps {
+    value?: number;
+    count?: number;
+    size?: number;
+    seed?: number;
+}
+
+export default function Stars({ value, count, size = 20, seed }: StarsProps) {
     // Stable “random” seed for each instance (if not specified externally)
     const seedRef = useRef(typeof seed === "number" ? seed : Math.random());
 

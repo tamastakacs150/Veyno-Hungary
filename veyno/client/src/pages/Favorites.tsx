@@ -120,7 +120,7 @@ export default function Favorites() {
                     <Link to={productLink(p)} className="block">
                       <div className="relative aspect-[3/4] overflow-hidden bg-muted cursor-pointer">
                         <img
-                          src={resolveImg(p, 1)}
+                          src={resolveImg(p)}
                           alt={p.name}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
@@ -217,7 +217,7 @@ export default function Favorites() {
                       <Link to={productLink(p)} className="block">
                         <div className="relative aspect-[3/4] overflow-hidden bg-muted cursor-pointer">
                           <img
-                            src={resolveImg(p, 1)}
+                            src={resolveImg(p)}
                             alt={p.name}
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"

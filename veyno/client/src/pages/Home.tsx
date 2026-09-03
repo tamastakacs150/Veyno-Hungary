@@ -263,7 +263,7 @@ export default function Home() {
   const cardProducts = useMemo(() => {
     return filteredProducts.map((p: any) => {
       const img =
-        resolveImg?.(p, 1) ||
+        resolveImg?.(p) ||
         (Array.isArray(p?.images) && p.images[0]) ||
         (candidatesFor ? candidatesFor(p, 1)[0] : null) ||
         "/placeholder.svg";

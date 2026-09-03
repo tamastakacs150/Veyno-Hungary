@@ -1,6 +1,7 @@
 ﻿// client/src/App.tsx
 import { Routes, Route, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useRef } from "react";
+import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast"; 
 import RouteLoadingOverlay from "@/components/RouteLoadingOverlay";
@@ -70,7 +71,7 @@ function OffsetLayout() {
 }
 
 // Admins only — everyone else will be sent to HOME
-function AdminRoute({ children }) {
+function AdminRoute({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     if (!user) return <Navigate to="/" replace />;
     if (user.role !== "admin") return <Navigate to="/" replace />;
@@ -78,7 +79,7 @@ function AdminRoute({ children }) {
 }
 
 // Protected path
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   return children;
@@ -114,11 +115,11 @@ export default function App() {
   }, []);
   
   useEffect(() => {
-    async function onMsg(e) {
+    async function onMsg(e: MessageEvent) {
       if (e.origin !== window.location.origin) return;
       const m = e.data;
       if (m && m.type === "EMAIL_VERIFIED" && m.user && m.token) {
-        await loginWithToken(m.user, m.token, { suppressRedirect: true });
+        await loginWithToken(m.user, m.token);
         toast({
             title: "Verification Success!",
             description: "We have logged you in automatically.",

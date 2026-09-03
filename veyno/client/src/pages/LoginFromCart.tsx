@@ -100,7 +100,7 @@ export default function Login() {
                 setErr("");
                 setMsg("");
                 try {
-                  await loginWithGoogle(resp.credential);
+                  await loginWithGoogle(resp.credential ?? "");
                   setMsg("Successful login with Google account.");
                   await mergeGuestCartThenGo(cartFromState, nav);
                 } catch (eRaw) {

@@ -259,6 +259,10 @@ export default function AiMarketingAssistant() {
     }, [videoJobId]);
 
     async function handlePublish() {
+        if (!post) {
+            toast.error("First, generate a post description!");
+            return;
+        }
         try {
             setPublishing(true);
             const platforms = [] as string[];
@@ -268,8 +272,8 @@ export default function AiMarketingAssistant() {
 
             const { data } = await axios.post("/api/social/publish", {
                 platforms,
-                caption: descriptionText,
-                hashtags: hashtagsArray,
+                caption: post.description,
+                hashtags: post.hashtags,
                 images: generatedImageUrls, // PUBLIC CDN URLs!
             }, { timeout: 60000 });
 

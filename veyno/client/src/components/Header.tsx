@@ -18,7 +18,7 @@ export default function FancyHeader() {
 
   const [animate, setAnimate] = useState(false);
 
-  const { user, logout, signOut, updateUser } = useAuth() || {};
+  const { user, logout, updateUser } = useAuth() || {};
   const { totalCount = 0 } = useCart() || { totalCount: 0 };
   const { ids: favIds = [] } = useWishlist() || { ids: [] };
   const favCount = favIds.length;
@@ -143,7 +143,6 @@ export default function FancyHeader() {
   const doLogout = async () => {
     try {
       if (typeof logout === "function") await logout();
-      else if (typeof signOut === "function") await signOut();
     } finally {
       setShowAccountMenu(false);
       navigate("/");

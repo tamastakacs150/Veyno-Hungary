@@ -84,9 +84,9 @@ export default function DashboardHome() {
         const curOrders = curOrdersArr.length;
         const prevOrders = prevOrdersArr.length;
 
-        const curRevenue = curOrdersArr.reduce((s, o) => s + normalizeUSD(getOrderTotal(o)), 0);
-        const prevRevenue = prevOrdersArr.reduce((s, o) => s + normalizeUSD(getOrderTotal(o)), 0);
-        const totalRevenue = (orders || []).reduce((s, o) => s + normalizeUSD(getOrderTotal(o)), 0);
+        const curRevenue = curOrdersArr.reduce((s: number, o: Record<string, unknown>) => s + normalizeUSD(getOrderTotal(o)), 0);
+        const prevRevenue = prevOrdersArr.reduce((s: number, o: Record<string, unknown>) => s + normalizeUSD(getOrderTotal(o)), 0);
+        const totalRevenue = (orders || []).reduce((s: number, o: Record<string, unknown>) => s + normalizeUSD(getOrderTotal(o)), 0);
 
         const avgOrderValue =
           (orders?.length || 0) > 0

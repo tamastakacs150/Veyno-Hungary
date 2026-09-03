@@ -60,7 +60,7 @@ export default function Login() {
               onSuccess={(resp) => {
                 setErr("");
                 setMsg("");
-                return loginWithGoogle(resp.credential)
+                return loginWithGoogle(resp.credential ?? "")
                   .then(() => {
                     setMsg("Successful login with Google account.");
                     setTimeout(() => nav("/"), 1500);

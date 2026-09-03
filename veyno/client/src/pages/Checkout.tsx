@@ -450,7 +450,7 @@ export default function Checkout() {
 
       // FOLLOW-UP
       const { data } = await api.post(`/checkout`, orderPayload, headers);
-      if (paymentMethod !== "online" && data?.orderId) {
+      if (data?.orderId) {
         try {
           await clearCart();
         } catch { }

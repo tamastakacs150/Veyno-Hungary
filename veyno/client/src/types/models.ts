@@ -47,6 +47,11 @@ export interface Product {
     images?: string[];
     variants?: ProductVariant[];
     sale?: ProductSale;
+    shortDescription?: string;
+    effectivePrice?: number;
+    discountPercent?: number;
+    ratingAvg?: number;
+    ratingCount?: number;
     createdAt?: string;
     updatedAt?: string;
     [key: string]: unknown;
@@ -66,6 +71,7 @@ export interface CartItem {
     _id?: string;
     id?: string;
     qty?: number;
+    sku?: string;
     selectedSize?: string | null;
 }
 

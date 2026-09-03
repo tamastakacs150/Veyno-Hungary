@@ -34,7 +34,7 @@ export default function UnsubscribedSuccessfully() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 pt-4">
-            <Button asChild variant="lg" size="lg" className="min-w-[140px] hover-scale bg-black text-white hover:bg-gray-900">
+            <Button asChild size="lg" className="min-w-[140px] hover-scale bg-black text-white hover:bg-gray-900">
               <Link to="/">
                 <Home className="w-4 h-4 mr-2" />
                 Back to Home

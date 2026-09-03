@@ -85,7 +85,7 @@ export default function Register() {
                             color: "#389e0d",
                             wordWrap: "break-word",
                             overflowWrap: "break-word",
-                            wwhiteSpace: "normal",
+                            whiteSpace: "normal",
                         }}
                     >
                         {msg}
@@ -99,7 +99,7 @@ export default function Register() {
                             setErr("");
                             setMsg("");
                             try {
-                                await loginWithGoogle(resp.credential);
+                                await loginWithGoogle(resp.credential ?? "");
 
                                 setMsg("Successful login with Google account.");
                                 setTimeout(() => nav(`/`), 300);

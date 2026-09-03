@@ -1,5 +1,5 @@
 // client/src/pages/Product.tsx
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef, type ReactNode } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import { useCart } from "@/context/CartContext";
@@ -57,7 +57,7 @@ export default function Product() {
       try {
         let item = null;
         try {
-          const r = await api.get(`/products/${encodeURIComponent(id)}`);
+          const r = await api.get(`/products/${encodeURIComponent(id ?? "")}`);
           if (!Array.isArray(r.data) && r.data && typeof r.data === "object") {
             item = r.data;
           }
@@ -123,7 +123,7 @@ export default function Product() {
         const sameCat = all.filter((x) => String(x._id) !== String(product._id) && (x.category || "") === cat);
         const others = all.filter((x) => String(x._id) !== String(product._id) && (x.category || "") !== cat);
 
-        function shuffle(arr) {
+        function shuffle<T>(arr: T[]): T[] {
           const a = [...arr];
           for (let i = a.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -163,7 +163,7 @@ export default function Product() {
 
     const idxs = [1, 2, 3];
 
-    function pickFirstExisting(urls) {
+    function pickFirstExisting(urls: string[]) {
       return new Promise((resolve, reject) => {
         let i = 0;
         let done = false;
@@ -190,7 +190,7 @@ export default function Product() {
 
     let cancelled = false;
     (async () => {
-      const found = [];
+      const found: string[] = [];
       for (const i of idxs) {
         const candidates = [
           `/api/products/${folder}/${i}.webp`,
@@ -215,10 +215,10 @@ export default function Product() {
 
   // inventory change monitoring
   useEffect(() => {
-    const onInv = (e) => {
+    const onInv = (e: Event & { detail?: { changes?: Array<{ productId?: string; stock?: number }> } }) => {
       const changes = Array.isArray(e?.detail) ? e.detail : [];
       if (!changes.length || !product?._id) return;
-      const hit = changes.find((c) => String(c.productId) === String(product._id));
+      const hit = changes.find((c: { productId?: string }) => String(c.productId) === String(product?._id));
       if (!hit) return;
       const newStock = Math.max(0, Number(product.stock || 0) - Number(hit.quantity || 0));
       setProduct((prev) => (prev ? { ...prev, stock: newStock } : prev));
@@ -289,7 +289,7 @@ export default function Product() {
 
     const bmi = weight / Math.pow(height / 100, 2);
 
-    const baseIndexFrom = (h, b) => {
+    const baseIndexFrom = (h: number, b: number) => {
       let i = 2; // baseline = M
       if (h < 158 || b < 17) i = 0;              // XS
       else if (h < 165 || b < 19) i = 1;         // S
@@ -304,12 +304,12 @@ export default function Product() {
     if (fitPref === "loose") idx += 1;
 
     const KNOWN = ["XS", "S", "M", "L", "XL"];
-    const normSize = (s) => String(s || "")
+    const normSize = (s: unknown) => String(s || "")
       .toUpperCase()
       .replace(/\s+/g, "")
       .replace("-", "");
 
-    const byStock = (v) => Number(v?.stock ?? 0) > 0;
+    const byStock = (v: { stock?: number }) => Number(v?.stock ?? 0) > 0;
 
     const sizesOriginal = variants.map(v => String(v.size));
     const sizesNorm = sizesOriginal.map(normSize);
@@ -328,10 +328,10 @@ export default function Product() {
     const orderedAllNorm = [...orderedKnown, ...unknownSorted.map(normSize)];
     if (orderedAllNorm.length === 0) return "";
 
-    const clampIdx = (v, a, b) => Math.max(a, Math.min(b, v));
+    const clampIdx = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
     const targetIdx = clampIdx(idx, 0, orderedAllNorm.length - 1);
-    const labelNormAt = (i) => orderedAllNorm[clampIdx(i, 0, orderedAllNorm.length - 1)];
-    const firstVariantByNorm = (n) => variants.find(v => normSize(v.size) === n);
+    const labelNormAt = (i: number) => orderedAllNorm[clampIdx(i, 0, orderedAllNorm.length - 1)];
+    const firstVariantByNorm = (n: string) => variants.find((v: { size?: string }) => normSize(v.size) === n);
 
     let chosen = firstVariantByNorm(labelNormAt(targetIdx));
     if (!chosen || !byStock(chosen)) {
@@ -739,7 +739,14 @@ function safeHtml(html: unknown) {
 }
 
 /* ---- Accordion and NiceSelect unchanged at the bottom ---- */
-function AccordionItem({ title, open, onToggle, children }) {
+interface AccordionItemProps {
+  title: ReactNode;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}
+
+function AccordionItem({ title, open, onToggle, children }: AccordionItemProps) {
   return (
     <div className={`acc-item ${open ? "open" : ""}`}>
       <button className="acc-toggle" type="button" onClick={onToggle} aria-expanded={open}>
@@ -755,7 +762,13 @@ function AccordionItem({ title, open, onToggle, children }) {
   );
 }
 
-function Accordion({ product, sizeReco }) {
+interface SizeReco {
+  fitPref?: string;
+  setFitPref?: (v: string) => void;
+  [key: string]: unknown;
+}
+
+function Accordion({ product, sizeReco }: { product: ProductModel | null; sizeReco?: SizeReco }) {
   const [open, setOpen] = useState({ size: false, a: false, b: false, c: false });
 
   useEffect(() => {
@@ -872,12 +885,19 @@ function Accordion({ product, sizeReco }) {
   );
 }
 
-function NiceSelect({ value, onChange, options = [], className = "" }) {
+interface SelectOption { value: string; label: string; }
+
+function NiceSelect({ value, onChange, options = [], className = "" }: {
+  value: string;
+  onChange: (v: string) => void;
+  options?: SelectOption[];
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(
     Math.max(0, options.findIndex((o) => o.value === value))
   );
-  const rootRef = useRef(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onDoc(e) {
