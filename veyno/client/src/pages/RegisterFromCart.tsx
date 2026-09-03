@@ -1,5 +1,7 @@
 //client/src/pages/RegisterFromCart.tsx
+import type React from "react";
 import { useState, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/auth/AuthContext";
@@ -7,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { Icon } from "../icons/icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import api from "../utils/api.js";
+import type { ApiError } from "@/types/models";
 
 export default function Register() {
     const nav = useNavigate();
@@ -46,7 +49,7 @@ export default function Register() {
         return Math.min(s, 4);
     }, [form.password]);
 
-    const submit = async (e) => {
+    const submit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErr("");
         setMsg("");
@@ -77,7 +80,8 @@ export default function Register() {
                 replace: true,
                 state: { from: "cart", cart: cartToKeep },
             });
-        } catch (e) {
+        } catch (eRaw) {
+            const e = eRaw as ApiError;
             setErr(e?.response?.data?.error || e?.message || "Registration failed.");
         } finally {
             setLoading(false);
@@ -120,7 +124,8 @@ export default function Register() {
                                         replace: true,
                                         state: { from: "cart", cart: cartFromState }
                                     }), 300);
-                                } catch (e) {
+                                } catch (eRaw) {
+                                    const e = eRaw as ApiError;
                                     setErr(e?.response?.data?.error || e?.message || "Google login failed.");
                                 }
                             }}
@@ -255,7 +260,7 @@ export default function Register() {
     );
 }
 
-const S = {
+const S: Record<string, CSSProperties> = {
     page: {
         width: "100%",
         minHeight: "100%",

@@ -1,11 +1,14 @@
 //client/src/pages/LoginFromCart.tsx
+import type React from "react";
 import { useState, useEffect } from "react";
+import type { CSSProperties } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/auth/AuthContext";
 import { Icon } from "../icons/icons";
 import { Button } from "@/components/ui/button";
 import api from "../utils/api.js";
+import type { ApiError } from "@/types/models";
 
 export default function Login() {
   const { login, loginWithGoogle, user } = useAuth();
@@ -54,7 +57,7 @@ export default function Login() {
     }
   }, [user]);
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
     setMsg("");
@@ -63,7 +66,8 @@ export default function Login() {
       await login(email, password);
       setMsg("Login successful.");
       await mergeGuestCartThenGo(cartFromState, nav);
-    } catch (e) {
+    } catch (eRaw) {
+        const e = eRaw as ApiError;
       setErr(e?.response?.data?.error || e?.message || "Error while logging in.");
     } finally {
       setLoading(false);
@@ -99,7 +103,8 @@ export default function Login() {
                   await loginWithGoogle(resp.credential);
                   setMsg("Successful login with Google account.");
                   await mergeGuestCartThenGo(cartFromState, nav);
-                } catch (e) {
+                } catch (eRaw) {
+                    const e = eRaw as ApiError;
                   setErr(e?.response?.data?.error || e?.message || "Google login failed.");
                 }
               }}
@@ -188,7 +193,7 @@ export default function Login() {
   );
 }
 
-const S = {
+const S: Record<string, CSSProperties> = {
   page: {
     width: "100%",
     minHeight: "100%",

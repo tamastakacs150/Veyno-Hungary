@@ -2,10 +2,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import api from "../utils/api.js";
+import type { ApiError, Category } from "@/types/models";
 
 export default function Sidebar() {
     const [open, setOpen] = useState(false);
-    const [cats, setCats] = useState([]);
+    const [cats, setCats] = useState<Category[]>([]);
     const location = useLocation();
 
     // Open Sidebar from Header event
@@ -25,7 +26,8 @@ export default function Sidebar() {
             try {
                 const { data } = await api.get("/categories");
                 if (!stop && Array.isArray(data)) setCats(data);
-            } catch (e) {
+            } catch (eRaw) {
+                const e = eRaw as ApiError & { response?: { status?: number } };
                 console.warn("Failed to load categories:", e?.response?.status, e?.message);
                 setCats([]);
             }
@@ -42,7 +44,8 @@ export default function Sidebar() {
                 const { data } = await api.get("/categories");
                 console.log("Sidebar /api/categories ->", data);
                 if (!stop && Array.isArray(data)) setCats(data);
-            } catch (e) {
+            } catch (eRaw) {
+                const e = eRaw as ApiError & { response?: { status?: number } };
                 console.warn("Failed to load categories:", e?.response?.status, e?.message);
                 setCats([]);
             }
@@ -66,7 +69,7 @@ export default function Sidebar() {
         return [...first, ...dynamic, ...tail];
     }, [cats]);
 
-    const isActive = (to) => (to === "/" ? location.pathname === "/" : location.pathname.startsWith(to));
+    const isActive = (to: string) => (to === "/" ? location.pathname === "/" : location.pathname.startsWith(to));
     const close = () => setOpen(false);
 
     return (

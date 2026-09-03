@@ -1,7 +1,10 @@
 //client/src/pages/ForgotPassword.tsx
+import type React from "react";
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/api.js";
+import type { ApiError } from "@/types/models";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -9,13 +12,14 @@ export default function ForgotPassword() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(""); setErr(""); setLoading(true);
     try {
       await api.post("/auth/forgot-password", { email });
       setMsg("If the address exists, we have sent an email to reset your password.");
-    } catch (e) {
+    } catch (eRaw) {
+        const e = eRaw as ApiError;
       setErr(e.response?.data?.error || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -68,7 +72,7 @@ export default function ForgotPassword() {
   );
 }
 
-const S = {
+const S: Record<string, CSSProperties> = {
   page: {
     width: "100%",
     minHeight: "100%",

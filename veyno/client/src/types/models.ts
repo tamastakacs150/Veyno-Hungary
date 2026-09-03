@@ -93,3 +93,17 @@ export interface AuthResponse {
     user: User;
     [key: string]: unknown;
 }
+
+/** Shape of an axios error as this app reads it. */
+export interface ApiError {
+    response?: { data?: { error?: string; message?: string } };
+    message?: string;
+    [key: string]: unknown;
+}
+
+/** A category as /categories returns it, used by the sidebar. */
+export interface Category {
+    slug: string;
+    title: string;
+    count?: number;
+}

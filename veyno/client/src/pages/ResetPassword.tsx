@@ -1,8 +1,11 @@
 //client/src/pages/ResetPassword.tsx
+import type React from "react";
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import api from "../utils/api.js";
 import { useAuth } from "@/auth/AuthContext";
+import type { ApiError } from "@/types/models";
 
 export default function ResetPassword() {
   const nav = useNavigate();
@@ -15,7 +18,7 @@ export default function ResetPassword() {
 
   const token = new URLSearchParams(useLocation().search).get("token");
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
     setOk("");
@@ -33,7 +36,8 @@ export default function ResetPassword() {
         login(data.token, data.user);
       }
       setTimeout(() => nav("/login"), 1500);
-    } catch (e) {
+    } catch (eRaw) {
+        const e = eRaw as ApiError;
       setErr(e.response?.data?.error || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -98,7 +102,7 @@ export default function ResetPassword() {
   );
 }
 
-const S = {
+const S: Record<string, CSSProperties> = {
   page: {
     width: "100%",
     minHeight: "100%",

@@ -1,9 +1,12 @@
 //client/src/pages/Login.tsx
+import type React from "react";
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "@/auth/AuthContext";
 import { Icon } from "../icons/icons";
+import type { ApiError } from "@/types/models";
 
 export default function Login() {
   const { login, loginWithGoogle } = useAuth();
@@ -15,7 +18,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
     setMsg("");
@@ -24,7 +27,8 @@ export default function Login() {
       await login(email, password);
       setMsg("Login successful.");
       setTimeout(() => nav("/"), 1500);
-    } catch (e) {
+    } catch (eRaw) {
+        const e = eRaw as ApiError;
       setErr(e?.response?.data?.error || e?.message || "Error while logging in.");
     } finally {
       setLoading(false);
@@ -134,7 +138,7 @@ export default function Login() {
   );
 }
 
-const S = {
+const S: Record<string, CSSProperties> = {
   page: {
     width: "100%",
     minHeight: "100%",
