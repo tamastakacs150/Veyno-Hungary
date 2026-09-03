@@ -56,14 +56,14 @@ export default function Sidebar() {
 
     // Menu order: All products → dynamic categories → Promotions → About us
     const items = useMemo(() => {
-        const first = [{ slug: "osszes", title: "All products", to: "/" }];
+        const first: Array<{ slug: string; title: string; to: string; count?: number }> = [{ slug: "osszes", title: "All products", to: "/" }];
         const dynamic = cats.map(c => ({
             slug: c.slug,
             title: c.title,
             to: `/category/${c.slug}`,
             count: c.count,
         }));
-        const tail = [
+        const tail: Array<{ slug: string; title: string; to: string; count?: number }> = [
             { slug: "rolunk", title: "About", to: "/about" },
         ];
         return [...first, ...dynamic, ...tail];

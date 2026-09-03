@@ -13,6 +13,7 @@ import { useCart } from "@/context/CartContext";
 import api from "@/utils/api";
 import resolveImg, { candidatesFor } from "@/utils/resolveImg";
 import { useStripe, useElements, PaymentRequestButtonElement, CardNumberElement, CardExpiryElement, CardCvcElement } from "@stripe/react-stripe-js";
+import type { PaymentRequest } from "@stripe/stripe-js";
 import { useCurrency } from "@/context/CurrencyContext";
 import "../styles/Checkout.css";
 
@@ -78,14 +79,14 @@ export default function Checkout() {
   const { clearCart } = useCart();
   const [prodMap, setProdMap] = useState<Map<string, any>>(new Map());
   const [cart, setCart] = useState<CartItem[]>([]);
-  const { format, rates, currencyCode } = useCurrency();
+  const { format, rates, currency: currencyCode } = useCurrency();
   const toHUF = (usd: number) => Math.round(Number(usd || 0) * (rates.HUF || 370));
 
   // Stripe
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState("");
-  const [paymentRequest, setPaymentRequest] = useState<stripeJs.PaymentRequest | null>(null);
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [canPay, setCanPay] = useState(false);
 
   // Customer + addresses
@@ -282,7 +283,7 @@ export default function Checkout() {
     });
 
     pr.canMakePayment().then((result) => {
-      if (result.canMakePayment) {
+      if (result?.canMakePayment) {
         setCanPay(true);
         setPaymentRequest(pr);
       } else {

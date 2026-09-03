@@ -327,7 +327,7 @@ const S: Record<string, CSSProperties> = {
     },
 };
 
-function meterColor(score) {
+function meterColor(score: number) {
     switch (score) {
         case 1: return "#ff6b6b";
         case 2: return "#f7b731";

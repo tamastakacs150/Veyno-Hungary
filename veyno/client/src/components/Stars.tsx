@@ -62,7 +62,7 @@ export default function Stars({ value, count, size = 20, seed }: StarsProps) {
     );
 }
 
-function clampRating(x) {
+function clampRating(x: number) {
     const num = Number(x);
     if (Number.isNaN(num)) return 4.5;
     // We compress it to between 0 and 5, then round it to the nearest tenth

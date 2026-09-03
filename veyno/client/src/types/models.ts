@@ -72,6 +72,8 @@ export interface CartItem {
     id?: string;
     qty?: number;
     sku?: string;
+    effectivePrice?: number;
+    originalPrice?: number;
     selectedSize?: string | null;
 }
 

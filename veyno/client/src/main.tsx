@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                                 <Suspense
                                     fallback={
                                         <div className="grid place-items-center min-h-screen">
-                                            <Loader label="Loading page..." />
+                                            <Loader />
                                         </div>
                                     }
                                 >

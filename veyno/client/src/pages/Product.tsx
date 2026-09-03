@@ -200,7 +200,7 @@ export default function Product() {
         ];
         try {
           const url = await pickFirstExisting(candidates);
-          if (!cancelled) found.push(url);
+          if (!cancelled) found.push(String(url));
         } catch {
           /* no image for this index – we skip it */
         }
@@ -528,7 +528,7 @@ export default function Product() {
 
           <div className="price-row">
             <div className="price">
-              {product?.discountPercent > 0 ? (
+              {(product?.discountPercent ?? 0) > 0 ? (
                 <>
                   <span className="old">{format(product.price)}</span>
                   <span className="now">{format(eff(product))}</span>
@@ -700,7 +700,7 @@ export default function Product() {
                 </div>
                 <p className="rel-name upper">{p.name}</p>
                 <p className="rel-price">
-                  {p?.discountPercent > 0 ? (
+                  {(p?.discountPercent ?? 0) > 0 ? (
                     <>
                       <span className="old">{format(p.price)}</span>
                       <span className="now">{format(eff(p))}</span>
@@ -765,7 +765,13 @@ function AccordionItem({ title, open, onToggle, children }: AccordionItemProps) 
 interface SizeReco {
   fitPref?: string;
   setFitPref?: (v: string) => void;
-  [key: string]: unknown;
+  hCm?: string;
+  setHCm?: (v: string) => void;
+  wKg?: string;
+  setWKg?: (v: string) => void;
+  suggested?: string;
+  setSize?: (v: string) => void;
+  showReco?: boolean;
 }
 
 function Accordion({ product, sizeReco }: { product: ProductModel | null; sizeReco?: SizeReco }) {
@@ -900,8 +906,8 @@ function NiceSelect({ value, onChange, options = [], className = "" }: {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    function onDoc(e) {
-      if (!rootRef.current?.contains(e.target)) setOpen(false);
+    function onDoc(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
     }
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -912,14 +918,14 @@ function NiceSelect({ value, onChange, options = [], className = "" }: {
     if (i >= 0) setActiveIdx(i);
   }, [value, options]);
 
-  function commit(i) {
+  function commit(i: number) {
     const opt = options[i];
     if (!opt) return;
     onChange?.(opt.value);
     setOpen(false);
   }
 
-  function onKey(e) {
+  function onKey(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setOpen(true);

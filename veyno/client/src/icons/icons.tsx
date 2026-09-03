@@ -401,5 +401,5 @@ export type IconName = keyof typeof registry;
 
 export function Icon({ name, ...rest }: IconProps & { name: IconName }) {
   const Cmp = registry[name];
-  return <Cmp {...rest} />;
+  return <Cmp {...(rest as { size?: number; className?: string })} />;
 }

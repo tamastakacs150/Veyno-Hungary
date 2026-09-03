@@ -115,7 +115,7 @@ export default function Home() {
         return (prev || []).map((p: any) => {
           const q = dec.get(String(p._id));
           if (!q) return p;
-          const next = Math.max(0, Number(p.stock || 0) - q);
+          const next = Math.max(0, Number(p.stock || 0) - Number(q));
           return { ...p, stock: next };
         });
       });

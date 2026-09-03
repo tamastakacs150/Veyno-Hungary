@@ -39,7 +39,7 @@ export default function LoadingOverlay({ open, label }: LoadingOverlayProps) {
             <div className="px-6 py-5 flex items-center gap-4 bg-transparent shadow-none">
                 <div className="relative">
                     <div className="absolute inset-0 rounded-full blur-xl opacity-15 bg-neutral-500 animate-pulse" />
-                    <Loader label={label ?? "One moment..."} />
+                    <Loader />
                 </div>
             </div>
         </div>,

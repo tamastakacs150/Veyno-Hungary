@@ -6,25 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import api from "@/utils/api";
 import { useCart } from "@/context/CartContext";
+import type { CartItem } from "@/types/models";
 import resolveImg, { candidatesFor } from "@/utils/resolveImg";
 import { useAuth } from "@/auth/AuthContext";
 import "../styles/Cart.css";
 import { useCurrency } from "@/context/CurrencyContext";
 
-type CartItem = {
-  _id?: string;
-  id?: string;
-  productId?: string;
-  sku?: string;
-  name: string;
-  price?: number;
-  effectivePrice?: number;
-  originalPrice?: number;
-  quantity: number;
-  size?: string | null;
-  category?: string | null;
-  image?: string | null;
-};
 
 export default function Cart() {
   const navigate = useNavigate();

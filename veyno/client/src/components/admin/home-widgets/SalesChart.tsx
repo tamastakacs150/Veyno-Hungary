@@ -32,7 +32,7 @@ export default memo(function SalesChart({ data }: { data: Row[] }) {
               border: "1px solid hsl(var(--border))",
               borderRadius: "var(--radius)",
             }}
-            formatter={(value: number) => [format(value), "Revenue"]}
+            formatter={(value) => [format(Number(value)), "Revenue"] as [string, string]}
           />
           <Line
             type="monotone"
