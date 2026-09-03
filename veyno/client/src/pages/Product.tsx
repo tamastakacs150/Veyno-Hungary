@@ -12,12 +12,13 @@ import { toast } from "../utils/toast.js";
 import { useCurrency } from "@/context/CurrencyContext";
 import ProductZoom from "../components/ProductZoom";
 import DOMPurify from "dompurify";
+import type { Product as ProductModel } from "@/types/models";
 
 const API_URL = import.meta.env?.VITE_API_URL || "";
 const eff = (p: any) => Number(p?.effectivePrice ?? p?.price ?? 0);
 
 // accent normalizer for lowercase comparison
-const norm = (s) =>
+const norm = (s: unknown) =>
   (s || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export default function Product() {
@@ -28,12 +29,12 @@ export default function Product() {
   const { has, toggle } = useWishlist();
   const [isFav, setIsFav] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [product, setProduct] = useState(null);
+  const [error, setError] = useState<string>("");
+  const [product, setProduct] = useState<ProductModel | null>(null);
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [qty, setQty] = useState(1);
-  const [related, setRelated] = useState([]);
+  const [related, setRelated] = useState<ProductModel[]>([]);
   const [size, setSize] = useState("");
   const [hCm, setHCm] = useState("");
   const [wKg, setWKg] = useState("");
@@ -152,7 +153,7 @@ export default function Product() {
   const folder = useMemo(() => folderFromProduct(product || {}), [product]);
 
   // --- Gallery: images from category folder (1..3 fallback)
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!product) {

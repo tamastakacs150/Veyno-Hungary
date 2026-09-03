@@ -1,61 +1,88 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+    type ReactNode,
+} from "react";
 import { useAuth } from "@/auth/AuthContext";
-import api from "@/utils/api"; // <--- 1. IMPORTÁLD BE AZ API-t (ellenõrizd az elérési utat!)
+import api from "@/utils/api";
+import type { CartItem, Product } from "@/types/models";
 
 const LS_KEY = "cart";
 
-const CartContext = createContext(null);
-export const useCart = () => useContext(CartContext);
+export interface CartContextValue {
+    cart: CartItem[];
+    addToCart: (product: AddToCartInput, qty?: number) => Promise<void>;
+    removeFromCart: (lineKey: string) => Promise<void>;
+    updateQty: (lineKey: string, delta: number) => Promise<void>;
+    clearCart: () => Promise<void>;
+    totalCount: number;
+    totalPrice: number;
+}
 
-function readLocal() {
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+/** A product plus the size chosen on the product page. */
+export type AddToCartInput = Product & {
+    size?: string | null;
+    selectedSize?: string | null;
+};
+
+const CartContext = createContext<CartContextValue | null>(null);
+
+export const useCart = (): CartContextValue => {
+    const ctx = useContext(CartContext);
+    if (!ctx) throw new Error("useCart must be used inside a CartProvider");
+    return ctx;
+};
+
+function readLocal(): CartItem[] {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]") as CartItem[]; }
     catch { return []; }
 }
-function writeLocal(items, writer) {
+function writeLocal(items: CartItem[], writer?: string) {
     localStorage.setItem(LS_KEY, JSON.stringify(items || []));
     if (writer) localStorage.setItem("cart_writer", writer);
 }
 
-// ---- Server sync helpers (AXIOS-ra átírva) ----
+// ---- Server sync helpers (axios) ----
 
-async function pushServerCart(items) {
-    // Az api.js már küldi a sütiket (withCredentials: true), nem kell manuális token header!
+async function pushServerCart(items: CartItem[]) {
+    // api.js already sends the cookies (withCredentials: true), no manual token header needed
     const payload = (items || []).map(it => ({
         productId: it.productId || it._id || it.id,
         quantity: it.quantity ?? it.qty ?? 1,
         size: it.size ?? null,
     }));
 
-    // Az api.js baseURL-je intézi az /api-t, itt csak a végpont kell
+    // api.js baseURL handles the /api prefix, only the endpoint is needed here
     await api.put("/me/cart", { items: payload }).catch(() => { });
 }
 
-async function addServerItem(productId, qty = 1, size = null) {
+async function addServerItem(productId: string, qty = 1, size: string | null = null) {
     await api.post("/me/cart/add", { productId, quantity: qty, size }).catch(() => { });
 }
 
-async function fetchServerCart() {
+async function fetchServerCart(): Promise<CartItem[] | null> {
     try {
-        // Nincs szükség token argumentumra, a süti intézi
+        // No token argument needed, the cookie handles it
         const { data } = await api.get("/me/cart");
 
-        // Adatfeldolgozás (mapping)
-        return (data.items || []).map(it => {
-            // A korábban javasolt robusztusabb mapping:
-            const productObj = (typeof it.productId === 'object' && it.productId !== null)
-                ? it.productId
+        return (data.items || []).map((it: CartItem) => {
+            const productObj = (typeof it.productId === "object" && it.productId !== null)
+                ? it.productId as Product
                 : null;
 
             return {
                 productId: productObj?._id || it.productId || it.id,
-                _id: productObj?._id || it.productId || it.id,
+                _id: productObj?._id || (it.productId as string) || it.id,
                 name: productObj?.name || it.name || "Ismeretlen",
                 price: productObj?.price || it.price || 0,
                 image: productObj?.image || it.image,
                 category: productObj?.category || it.category,
                 quantity: it.quantity ?? 1,
                 size: it.size ?? null,
-            };
+            } as CartItem;
         });
     } catch (err) {
         console.error("Cart fetch error:", err);
@@ -63,12 +90,12 @@ async function fetchServerCart() {
     }
 }
 
-export function CartProvider({ children }) {
-    const { token, user } = useAuth(); // A user objektum is hasznos lehet, ha a token nem elég
-    // A token vizsgálat helyett inkább a user meglétét nézzük, de maradhat a token is
+export function CartProvider({ children }: { children: ReactNode }) {
+    const { token, user } = useAuth(); // the user object is useful too, if the token is not enough
+    // instead of checking the token we look at whether there is a user, but the token can stay
     const isLoggedIn = !!token || !!user;
 
-    const [cart, setCart] = useState(() => (isLoggedIn ? [] : readLocal()));
+    const [cart, setCart] = useState<CartItem[]>(() => (isLoggedIn ? [] : readLocal()));
 
     useEffect(() => {
         writeLocal(cart, isLoggedIn ? "auth" : "guest");
@@ -80,7 +107,7 @@ export function CartProvider({ children }) {
         return () => window.removeEventListener("cart-updated", onUpdated);
     }, []);
 
-    // Szerver szinkronizáció
+    // Server synchronisation
     useEffect(() => {
         let mounted = true;
         (async () => {
@@ -97,7 +124,7 @@ export function CartProvider({ children }) {
                 return;
             }
 
-            // Itt már nem kell token-t átadni
+            // no token needs to be passed here any more
             const server = await fetchServerCart();
 
             if (!mounted) return;
@@ -106,7 +133,7 @@ export function CartProvider({ children }) {
                 setCart(server);
                 writeLocal(server, "auth");
             } else if (local.length) {
-                // Ha a szerver üres, de van lokális, feltoljuk
+                // server cart is empty but there is a local one, push it up
                 setCart(local);
                 writeLocal(local, "auth");
                 try { await pushServerCart(local); } catch { }
@@ -117,20 +144,19 @@ export function CartProvider({ children }) {
         })();
 
         return () => { mounted = false; };
-    }, [isLoggedIn]); // Token változás helyett isLoggedIn
+    }, [isLoggedIn]); // isLoggedIn instead of token changes
 
     // ---- Operations ----
-    const addToCart = async (product, qty = 1) => {
+    const addToCart = async (product: AddToCartInput, qty = 1) => {
         const id = product._id;
         const size = product.size ?? product.selectedSize ?? null;
 
         setCart(prev => {
-            // ... (a te eredeti logikád maradhat itt változatlan) ...
             const idx = prev.findIndex(i => {
                 const pid = (i.productId ?? i._id);
                 return pid === id && String(i.size ?? "") === String(size ?? "");
             });
-            let next = [];
+            let next: CartItem[] = [];
             if (idx >= 0) {
                 next = prev.map(i =>
                     ((i.productId ?? i._id) === id && String(i.size ?? "") === String(size ?? ""))
@@ -157,8 +183,8 @@ export function CartProvider({ children }) {
         }
     };
 
-    const removeFromCart = async (lineKey) => {
-        let nextCart = [];
+    const removeFromCart = async (lineKey: string) => {
+        let nextCart: CartItem[] = [];
         setCart(prev => {
             nextCart = prev.filter(i => {
                 const pid = i.productId ?? i._id;
@@ -168,12 +194,12 @@ export function CartProvider({ children }) {
             return nextCart;
         });
 
-        // A pushServerCart itt egyszerûbb, mert a teljes állapotot küldi
+        // pushServerCart is simpler here because it sends the whole state
         if (isLoggedIn) await pushServerCart(nextCart);
     };
 
-    const updateQty = async (lineKey, delta) => {
-        let nextCart = [];
+    const updateQty = async (lineKey: string, delta: number) => {
+        let nextCart: CartItem[] = [];
         setCart(prev => {
             nextCart = prev.map(i => {
                 const pid = i.productId ?? i._id;

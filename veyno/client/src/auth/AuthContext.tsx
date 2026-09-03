@@ -1,24 +1,31 @@
-﻿// client/src/auth/AuthContext.tsx
-import { createContext, useContext, useEffect, useState } from "react";
+// client/src/auth/AuthContext.tsx
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    type ReactNode,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import { wishlistStore } from "../stores/wishlistStore.js";
 import { useToast } from "@/hooks/use-toast";
+import type { AuthResponse, CartItem, User } from "@/types/models";
 
 /* ===== LocalStorage helpers ===== */
-function getGuestCart() {
+function getGuestCart(): CartItem[] {
     try {
-        return JSON.parse(localStorage.getItem("cart") || "[]");
+        return JSON.parse(localStorage.getItem("cart") || "[]") as CartItem[];
     } catch {
         return [];
     }
 }
-function setGuestCart(items) {
+function setGuestCart(items: CartItem[]) {
     localStorage.setItem("cart", JSON.stringify(items || []));
     localStorage.setItem("cart_writer", "guest");
     window.dispatchEvent(new Event("cart-updated"));
 }
-function setAuthCart(items) {
+function setAuthCart(items: CartItem[]) {
     localStorage.setItem("cart", JSON.stringify(items || []));
     localStorage.setItem("cart_writer", "auth");
     window.dispatchEvent(new Event("cart-updated"));
@@ -42,8 +49,11 @@ async function mergeGuestCartToServer() {
 async function pullServerCartToLocal() {
     try {
         const { data } = await api.get("/me/cart");
-        const normalized = (data.items || []).map((it) => ({
-            productId: it.productId?._id || it.productId || it.id,
+        const normalized: CartItem[] = (data.items || []).map((it: CartItem) => ({
+            productId:
+                (typeof it.productId === "object" && it.productId?._id) ||
+                it.productId ||
+                it.id,
             quantity: it.quantity ?? it.qty ?? 1,
             name: it.name,
             price: it.price,
@@ -56,7 +66,18 @@ async function pullServerCartToLocal() {
 }
 
 /* ===== Auth Context ===== */
-const defaultAuth = {
+export interface AuthContextValue {
+    user: User | null;
+    token: string | null;
+    login: (email: string, password: string) => Promise<AuthResponse | void>;
+    register: (name: string, email: string, password: string) => Promise<unknown>;
+    logout: () => void | Promise<void>;
+    updateUser: (patch: Partial<User>) => void;
+    loginWithGoogle: (credential: string) => Promise<AuthResponse | void>;
+    loginWithToken: (userObj: User, tokenStr: string) => Promise<void>;
+}
+
+const defaultAuth: AuthContextValue = {
     user: null,
     token: null,
     login: async () => { },
@@ -67,15 +88,17 @@ const defaultAuth = {
     loginWithToken: async () => { },
 };
 
-const AuthCtx = createContext(defaultAuth);
+const AuthCtx = createContext<AuthContextValue>(defaultAuth);
 export const useAuth = () => useContext(AuthCtx);
 
-export default function AuthProvider({ children }) {
-    const [token, setToken] = useState(() => localStorage.getItem("token"));
-    const [user, setUser] = useState(() => {
+export default function AuthProvider({ children }: { children: ReactNode }) {
+    const [token, setToken] = useState<string | null>(() =>
+        localStorage.getItem("token")
+    );
+    const [user, setUser] = useState<User | null>(() => {
         try {
             const raw = localStorage.getItem("user");
-            return raw ? JSON.parse(raw) : null;
+            return raw ? (JSON.parse(raw) as User) : null;
         } catch {
             return null;
         }
@@ -95,7 +118,7 @@ export default function AuthProvider({ children }) {
 
     // INSIDE the AuthProvider component:
     useEffect(() => {
-        function onStorage(e) {
+        function onStorage(e: StorageEvent) {
             if (e.key === "token") {
                 const t = e.newValue || null;
                 setToken(t);
@@ -104,7 +127,7 @@ export default function AuthProvider({ children }) {
             }
             if (e.key === "user") {
                 try {
-                    const u = e.newValue ? JSON.parse(e.newValue) : null;
+                    const u = e.newValue ? (JSON.parse(e.newValue) as User) : null;
                     setUser(u);
                 } catch {
                     setUser(null);
@@ -116,16 +139,16 @@ export default function AuthProvider({ children }) {
     }, []);
 
     /* ===== User update (Header responds) ===== */
-    const updateUser = (patch) => {
+    const updateUser = (patch: Partial<User>) => {
         setUser((prev) => {
-            const next = { ...(prev || {}), ...(patch || {}) };
+            const next = { ...(prev || {}), ...(patch || {}) } as User;
             localStorage.setItem("user", JSON.stringify(next));
             return next;
         });
     };
 
     /* ===== Google login ===== */
-    const loginWithGoogle = async (credential) => {
+    const loginWithGoogle = async (credential: string) => {
         const { data } = await api.post("/auth/google", { credential });
         if (!data?.token)
             throw new Error("Missing token in login response.");
@@ -148,11 +171,11 @@ export default function AuthProvider({ children }) {
         const role = data?.user?.role ?? JSON.parse(localStorage.getItem("user") || "{}")?.role;
         navigate(role === "admin" ? "/admin" : "/", { replace: true });
 
-        return data;
+        return data as AuthResponse;
     };
 
     /* ===== Normal login ===== */
-    const login = async (email, password) => {
+    const login = async (email: string, password: string) => {
 
 
 
@@ -191,11 +214,11 @@ export default function AuthProvider({ children }) {
             data?.user?.role;
         navigate(role === "admin" ? "/admin" : "/", { replace: true });
 
-        return data;
+        return data as AuthResponse;
     };
 
     /* ===== Registration ===== */
-    const register = async (name, email, password) => {
+    const register = async (name: string, email: string, password: string) => {
         const { data } = await api.post("/auth/register", { name, email, password });
         await mergeGuestCartToServer();
         await pullServerCartToLocal();
@@ -234,7 +257,7 @@ export default function AuthProvider({ children }) {
                     }
                 }
             } catch (e) {
-                console.warn("AuthContext hydrate error:", e.message);
+                console.warn("AuthContext hydrate error:", (e as Error).message);
                 setUser(null);
                 setToken(null);
                 localStorage.removeItem("token");
@@ -246,7 +269,7 @@ export default function AuthProvider({ children }) {
     }, [token]);
 
     // --- COMMON helper: set auth state from token (INSIDE COMPONENT!) ---
-    const applyAuthFromToken = async (userObj, tokenStr) => {
+    const applyAuthFromToken = async (userObj: User, tokenStr: string) => {
         setToken(tokenStr);
         localStorage.setItem("token", tokenStr);
 
@@ -269,7 +292,7 @@ export default function AuthProvider({ children }) {
         } catch { }
     };
 
-    const loginWithToken = async (userObj, tokenStr) => {
+    const loginWithToken = async (userObj: User, tokenStr: string) => {
         if (!userObj || !tokenStr) throw new Error("Missing user/token for loginWithToken.");
         await applyAuthFromToken(userObj, tokenStr);
     };
