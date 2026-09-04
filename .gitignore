@@ -16,3 +16,9 @@ build/
 
 #Google key
 vertex-sa.json
+
+# Tanusitvanyok es kulcsok (a localhost mkcert par mar bekerult egyszer)
+*.pem
+*.key
+*.crt
+*.pfx
