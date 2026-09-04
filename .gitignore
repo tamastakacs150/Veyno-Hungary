@@ -22,3 +22,6 @@ vertex-sa.json
 *.key
 *.crt
 *.pfx
+
+# Az AI marketing futasidejű kimenete - nem forras
+veyno/client/public/generated/
